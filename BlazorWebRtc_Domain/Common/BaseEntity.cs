@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BlazorWebRtc_Domain.Common
+﻿namespace BlazorWebRtc_Domain.Common
 {
     public abstract class BaseEntity
     {
@@ -15,5 +9,6 @@ namespace BlazorWebRtc_Domain.Common
         }
         public DateTime CreateDate { get; set; }
         public Guid Id { get; set; }
+        
     }
 }
