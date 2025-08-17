@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36408.4 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorWebRtc_Client", "BlazorWebRtc_Client\BlazorWebRtc_Client.csproj", "{3314B19C-B4AF-4178-9C01-E7973D7466F8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorWebRtc_Api", "BlazorWebRtc_Api\BlazorWebRtc_Api.csproj", "{944DC2AD-C4C7-443A-8BE5-9116923A6CF7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorWebRtc_Domain", "BlazorWebRtc_Domain\BlazorWebRtc_Domain.csproj", "{2EFA21F3-B3AE-4E98-87A5-FD578A6F80C1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorWebRtc_Persistence", "BlazorWebRtc_Persistence\BlazorWebRtc_Persistence.csproj", "{38E5EC18-5052-4AFF-947D-CEB1C8DDDA62}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorWebRtc_Application", "BlazorWebRtc_Application\BlazorWebRtc_Application.csproj", "{F1492951-C368-4E3A-BA02-3B960F370419}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3314B19C-B4AF-4178-9C01-E7973D7466F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3314B19C-B4AF-4178-9C01-E7973D7466F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3314B19C-B4AF-4178-9C01-E7973D7466F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3314B19C-B4AF-4178-9C01-E7973D7466F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{944DC2AD-C4C7-443A-8BE5-9116923A6CF7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{944DC2AD-C4C7-443A-8BE5-9116923A6CF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{944DC2AD-C4C7-443A-8BE5-9116923A6CF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{944DC2AD-C4C7-443A-8BE5-9116923A6CF7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2EFA21F3-B3AE-4E98-87A5-FD578A6F80C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2EFA21F3-B3AE-4E98-87A5-FD578A6F80C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2EFA21F3-B3AE-4E98-87A5-FD578A6F80C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2EFA21F3-B3AE-4E98-87A5-FD578A6F80C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{38E5EC18-5052-4AFF-947D-CEB1C8DDDA62}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38E5EC18-5052-4AFF-947D-CEB1C8DDDA62}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38E5EC18-5052-4AFF-947D-CEB1C8DDDA62}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38E5EC18-5052-4AFF-947D-CEB1C8DDDA62}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1492951-C368-4E3A-BA02-3B960F370419}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1492951-C368-4E3A-BA02-3B960F370419}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1492951-C368-4E3A-BA02-3B960F370419}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1492951-C368-4E3A-BA02-3B960F370419}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2A126203-F8DD-4D6A-B109-D411B55D8935}
+	EndGlobalSection
+EndGlobal
