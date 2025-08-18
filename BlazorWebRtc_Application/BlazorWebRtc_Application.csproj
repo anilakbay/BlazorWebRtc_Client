@@ -7,8 +7,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MediatR" Version="13.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\BlazorWebRtc_Domain\BlazorWebRtc_Domain.csproj" />
     <ProjectReference Include="..\BlazorWebRtc_Persistence\BlazorWebRtc_Persistence.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Features\Commands\" />
+    <Folder Include="Features\Queries\" />
+    <Folder Include="Interface\" />
+    <Folder Include="Mapping\" />
   </ItemGroup>
 
 </Project>
