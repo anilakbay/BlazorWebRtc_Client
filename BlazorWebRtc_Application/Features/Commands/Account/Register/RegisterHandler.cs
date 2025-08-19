@@ -10,24 +10,21 @@ using System.Security.Cryptography;
 
 namespace BlazorWebRtc_Application.Features.Commands.Account.Register
 {
-    public class RegisterHandler : IRequestHandler<RegisterCommand, BaseResponseModel>
+    public class RegisterHandler : IRequestHandler<RegisterCommand, Guid>
     {
         private readonly AppDbContext _context;
-        private readonly BaseResponseModel _responseModel;
+        
 
 
-        public RegisterHandler(AppDbContext context, BaseResponseModel responseModel)
+        public RegisterHandler(AppDbContext context)
         {
-            _context = context;
-            _responseModel = responseModel;
+            _context = context;            
         }
-        public async Task<BaseResponseModel> Handle(RegisterCommand request, CancellationToken cancellationToken)
+        public async Task<Guid> Handle(RegisterCommand request, CancellationToken cancellationToken)
         {
             if (await _context.Users.AnyAsync(u => u.UserName == request.UserName, cancellationToken))
             {
-                _responseModel.IsSuccess = false;
-                _responseModel.Message = "Username already exists.";
-                return _responseModel;
+                throw new Exception("User already exist");
 
             }
 
@@ -50,17 +47,13 @@ namespace BlazorWebRtc_Application.Features.Commands.Account.Register
                 user.ProfilePicture = imagePath;
                 _context.Users.Update(user);
                 await _context.SaveChangesAsync(cancellationToken);
-                _responseModel.IsSuccess = true;
-                _responseModel.Message = "User Created Successfully";
-                _responseModel.Data = user;
-                return _responseModel;
+                return user.Id;
+
 
             }
 
-            _responseModel.IsSuccess = false;
-            _responseModel.Message = "Profile Picture Not Saved";
-            return _responseModel;
-
+            
+            
 
         }
 

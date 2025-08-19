@@ -8,7 +8,7 @@ namespace BlazorWebRtc_Domain
         public string PasswordSalt { get; set; }
         public string PasswordHash { get; set; }
         public string Email { get; set; }
-        public string ProfilePicture { get; set; }
+        public string? ProfilePicture { get; set; }
         public virtual List<UserFriend> Friends { get; set; } = new List<UserFriend>();
     }
 }

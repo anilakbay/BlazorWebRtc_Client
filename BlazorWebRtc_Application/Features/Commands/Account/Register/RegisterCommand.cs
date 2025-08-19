@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace BlazorWebRtc_Application.Features.Commands.Account.Register
 {
-    public class RegisterCommand:IRequest<BaseResponseModel>
+    public class RegisterCommand:IRequest<Guid>
     {
         public string UserName { get; set; }
         public string Email { get; set; }

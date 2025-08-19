@@ -10,6 +10,7 @@
     <PackageReference Include="MediatR" Version="13.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Cryptography.KeyDerivation" Version="9.0.8" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.17" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.14.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -19,7 +20,6 @@
 
   <ItemGroup>
     <Folder Include="Features\Queries\" />
-    <Folder Include="Interface\" />
     <Folder Include="Mapping\" />
   </ItemGroup>
 
