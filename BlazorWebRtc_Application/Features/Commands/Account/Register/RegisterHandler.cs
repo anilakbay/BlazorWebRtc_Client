@@ -10,13 +10,13 @@ using System.Security.Cryptography;
 
 namespace BlazorWebRtc_Application.Features.Commands.Account.Register
 {
-    public class RegisterHandler : IRequestHandler<RegisterCommand, Guid>
+    public class LoginHandler : IRequestHandler<RegisterCommand, Guid>
     {
         private readonly AppDbContext _context;
         
 
 
-        public RegisterHandler(AppDbContext context)
+        public LoginHandler(AppDbContext context)
         {
             _context = context;            
         }
@@ -48,12 +48,9 @@ namespace BlazorWebRtc_Application.Features.Commands.Account.Register
                 _context.Users.Update(user);
                 await _context.SaveChangesAsync(cancellationToken);
                 return user.Id;
-
-
             }
-
             
-            
+            throw new Exception("Profile Picture Not Saved");
 
         }
 
@@ -71,12 +68,13 @@ namespace BlazorWebRtc_Application.Features.Commands.Account.Register
             {
                 await profilePicture.CopyToAsync(fileStream);
             }
-            return Path.Combine("images", "profile_pictures");
+            return Path.Combine("images", "profile_pictures", fileName);
         }
 
         private (string hash, string salt) HashPassword(string password)
         {
             byte[] salt = new byte[128 / 8];
+
             using (var rng = RandomNumberGenerator.Create())
             {
                 rng.GetBytes(salt);
@@ -87,12 +85,10 @@ namespace BlazorWebRtc_Application.Features.Commands.Account.Register
                 salt: salt,
                 prf: KeyDerivationPrf.HMACSHA256,
                 iterationCount: 10000,
-                numBytesRequested: 256 / 8
-                ));
-            return (hashed, Convert.ToBase64String(salt));
-
-
+                numBytesRequested: 256 / 8));
         }
+
+       
     }
 }
 
