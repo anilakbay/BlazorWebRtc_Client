@@ -1,4 +1,7 @@
+using BlazorWebRtc_Application.Features.Commands.Account.Login;
 using BlazorWebRtc_Application.Features.Commands.Account.Register;
+using BlazorWebRtc_Application.Features.Commands.RequestFeature;
+using BlazorWebRtc_Application.Features.Queries.RequestFeature;
 using BlazorWebRtc_Application.Features.Queries.UserInfo;
 using BlazorWebRtc_Application.Interface.Services;
 using BlazorWebRtc_Application.Models;
@@ -18,13 +21,16 @@ builder.Services.AddControllers();
 builder.Services.AddScoped(typeof(BaseResponseModel));
 builder.Services.AddScoped<IAccountService, BlazorWebRtc_Application.Services.AccountService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IRequestService, RequestService>();
 builder.Services.AddMediatR(cfg =>
 {
     cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
     cfg.RegisterServicesFromAssembly(typeof(RegisterHandler).Assembly);
     cfg.RegisterServicesFromAssembly(typeof(LoginHandler).Assembly);
     cfg.RegisterServicesFromAssembly(typeof(UserListHandler).Assembly);
-}
+    cfg.RegisterServicesFromAssembly(typeof(RequestHandler).Assembly);
+    cfg.RegisterServicesFromAssembly(typeof(RequestsHandler).Assembly);
+}                                                                     
 
 );
 builder.Services.AddHttpContextAccessor();

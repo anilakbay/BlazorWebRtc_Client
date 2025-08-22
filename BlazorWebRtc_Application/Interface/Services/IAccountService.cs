@@ -6,17 +6,7 @@ namespace BlazorWebRtc_Application.Interface.Services
 {
     public interface IAccountService
     {
-        Task<object?> SignIn(LoginCommand command);
-        Task<object?> SignUp(RegisterCommand command);
-
-        // IAccountService arayüzü, hesap işlemleri için servis sözleşmesini tanımlar.
-        // SignUp metodu, dışarıdan RegisterCommand alır (kayıt bilgileri) 
-        // ve işlem sonucunu standartlaştırılmış BaseResponseModel olarak döner.
-        public interface IAccountService
-        {
-            Task<BaseResponseModel> SignUp(RegisterCommand command);
-            Task<BaseResponseModel> SignIn(LoginCommand command);
-
-        }
+        Task<BaseResponseModel> SignIn(LoginCommand command); // Mevcut kullanıcı giriş işlemi, başarılı ise token döner
+        Task<BaseResponseModel> SignUp(RegisterCommand command); // Yeni kullanıcı kaydı, başarılı ise true döner
     }
 }

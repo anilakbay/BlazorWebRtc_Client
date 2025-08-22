@@ -12,49 +12,44 @@ namespace BlazorWebRtc_Application.Features.Queries.UserInfo
     {
         private readonly AppDbContext _context;
         private readonly IHttpContextAccessor _contextAccessor;
-        private string? userId;
+
         public UserListHandler(AppDbContext context, IHttpContextAccessor contextAccessor)
         {
-            _contextAccessor = contextAccessor;
             _context = context;
+            _contextAccessor = contextAccessor;
         }
 
-        public async Task<List<UserDTO>> Handle(UserListQuery request, UserDTO userDTO, CancellationToken cancellationToken)
+        // Kullanıcı listesi sorgusu
+        public async Task<List<UserDTO>> Handle(UserListQuery request, CancellationToken cancellationToken)
         {
+            // Tüm kullanıcıları getir
             List<User> users = await _context.Users.ToListAsync(cancellationToken);
-            userId = _contextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            // Mevcut kullanıcı ID'si
+            var currentUserId = _contextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            List<UserDTO> userDTOs = new List<UserDTO>();
 
             if (users != null)
             {
-                List<UserDTO> userDTOs = new List<UserDTO>();
                 foreach (var item in users)
                 {
-
-                    if(userId is not null && userId != item.Id.ToString())
+                    // Mevcut kullanıcıyı listeye ekleme
+                    if (currentUserId != null && currentUserId != item.Id.ToString())
                     {
-                        UserDTO userDTO = new UserDTO();
-                        UserDTO.UserName = item.UserName;
-                        UserDTO.Email = item.Email;
-                        userDTO.ProfilePicture = item.ProfilePicture;
-                        userDTO.UserId = item.Id;
-                        userDTOs.Add(userDTO);
+                        var dto = new UserDTO
+                        {
+                            UserId = item.Id,
+                            UserName = item.UserName,
+                            Email = item.Email,
+                            ProfilePicture = item.ProfilePicture
+                        };
+                        userDTOs.Add(dto);
                     }
-                
                 }
-                return userDTOs;
             }
-            return null;             
-         
-        }
 
-        public Task<List<User>> Handle(UserListQuery request, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        Task<List<UserDTO>> IRequestHandler<UserListQuery, List<UserDTO>>.Handle(UserListQuery request, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
+            return userDTOs; // Boş olsa bile boş liste döner
         }
     }
 }

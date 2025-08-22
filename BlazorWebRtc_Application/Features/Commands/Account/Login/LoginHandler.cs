@@ -14,8 +14,8 @@ namespace BlazorWebRtc_Application.Features.Commands.Account.Login
     // Kullanıcı giriş işlemlerini yöneten MediatR handler
     public class LoginHandler : IRequestHandler<LoginCommand, (bool Success, string Token)>
     {
-        private readonly AppDbContext _context;           // DB context
-        private readonly IConfiguration _configuration;   // App ayarları
+        private readonly AppDbContext _context;
+        private readonly IConfiguration _configuration;
 
         public LoginHandler(AppDbContext context, IConfiguration configuration)
         {
@@ -23,61 +23,47 @@ namespace BlazorWebRtc_Application.Features.Commands.Account.Login
             _configuration = configuration;
         }
 
-        // Login isteğini işleyen metod
         public async Task<(bool Success, string Token)> Handle(LoginCommand request, CancellationToken cancellationToken)
         {
             var user = await _context.Users
                 .SingleOrDefaultAsync(u => u.UserName == request.UserName, cancellationToken);
 
-            // Kullanıcı yoksa veya şifre yanlışsa başarısız
             if (user == null || !VerifyPassword(request.Password, user.PasswordHash, user.PasswordSalt))
                 return (false, string.Empty);
 
-            // JWT token oluştur
             var token = GenerateJwtToken(user);
             return (true, token);
         }
 
-        // JWT ayarlarını temsil eden model
-        private class JwtSettings
-        {
-            public string SecretKey { get; set; }
-            public string Issuer { get; set; }
-            public string Audience { get; set; }
-            public int ExpirationMinutes { get; set; }
-        }
-
-        // JWT token üretme metodu
+        // JWT token üretme metodu, Bind kullanmadan
         private string GenerateJwtToken(User user)
         {
-            // appsettings.json'dan JWT ayarlarını çek
-            var jwtSettings = new JwtSettings();
-            _configuration.GetSection("JwtSettings").Bind(jwtSettings);
+            // appsettings.json’dan direkt değer alıyoruz
+            string secretKey = _configuration["JwtSettings:SecretKey"];
+            string issuer = _configuration["JwtSettings:Issuer"];
+            string audience = _configuration["JwtSettings:Audience"];
+            int expirationMinutes = int.Parse(_configuration["JwtSettings:ExpirationMinutes"] ?? "60");
 
-            // Token imzası için güvenlik anahtarı
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            // Token içeriği (claims)
             var claims = new[]
             {
                 new Claim(JwtRegisteredClaimNames.Name, user.UserName),
                 new Claim(JwtRegisteredClaimNames.NameId, user.Id.ToString())
             };
 
-            // JWT oluştur
             var token = new JwtSecurityToken(
-                issuer: jwtSettings.Issuer,
-                audience: jwtSettings.Audience,
+                issuer: issuer,
+                audience: audience,
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(jwtSettings.ExpirationMinutes),
+                expires: DateTime.UtcNow.AddMinutes(expirationMinutes),
                 signingCredentials: creds
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        // Şifre doğrulama metodu
         private bool VerifyPassword(string password, string storedHash, string storedSalt)
         {
             var saltBytes = Convert.FromBase64String(storedSalt);

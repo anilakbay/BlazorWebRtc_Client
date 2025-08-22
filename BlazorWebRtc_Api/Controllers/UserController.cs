@@ -10,21 +10,26 @@ namespace BlazorWebRtc_Api.Controllers
     public class UserController : ControllerBase
     {
         private readonly IAccountService _accountService;
+
         public UserController(IAccountService accountService)
         {
             _accountService = accountService;
         }
 
+        // Kullanıcı kayıt (JSON body ile)
         [HttpPost("Register")]
-        public async Task<IActionResult> Register([FromForm] RegisterCommand command)
-        {           
-            return Ok(await _accountService.SignUp(command));
+        public async Task<IActionResult> Register([FromBody] RegisterCommand command)
+        {
+            var result = await _accountService.SignUp(command);
+            return Ok(result);
         }
 
+        // Kullanıcı giriş (JSON body ile)
         [HttpPost("Login")]
-        public async Task<IActionResult> Login([FromBody]LoginCommand command)
+        public async Task<IActionResult> Login([FromBody] LoginCommand command)
         {
-            return Ok(await _accountService.SignIn(command));
+            var result = await _accountService.SignIn(command);
+            return Ok(result);
         }
     }
 }
