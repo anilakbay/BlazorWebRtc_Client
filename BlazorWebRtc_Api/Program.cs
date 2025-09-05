@@ -1,6 +1,6 @@
 using BlazorWebRtc_Application.Features.Commands.Account.Login;
-using BlazorWebRtc_Application.Features.Commands.Account.Register;
 using BlazorWebRtc_Application.Features.Commands.RequestFeature;
+using BlazorWebRtc_Application.Features.Commands.UserFriend;
 using BlazorWebRtc_Application.Features.Queries.RequestFeature;
 using BlazorWebRtc_Application.Features.Queries.UserInfo;
 using BlazorWebRtc_Application.Interface.Services;
@@ -22,6 +22,7 @@ builder.Services.AddScoped(typeof(BaseResponseModel));
 builder.Services.AddScoped<IAccountService, BlazorWebRtc_Application.Services.AccountService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IRequestService, RequestService>();
+builder.Services.AddScoped<IUserFriendService, UserFriendService>();
 builder.Services.AddMediatR(cfg =>
 {
     cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
@@ -30,6 +31,7 @@ builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(typeof(UserListHandler).Assembly);
     cfg.RegisterServicesFromAssembly(typeof(RequestHandler).Assembly);
     cfg.RegisterServicesFromAssembly(typeof(RequestsHandler).Assembly);
+    cfg.RegisterServicesFromAssembly(typeof(UserFriendHandler).Assembly); 
 }                                                                     
 
 );
@@ -59,6 +61,17 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowBlazorApp",
+        policy =>
+        {
+            policy.WithOrigins("https://localhost:7101/")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+        });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -71,7 +84,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
-
+app.UseCors("AllowBlazorApp");
 app.MapControllers();
 
 app.Run();
