@@ -23,5 +23,15 @@ namespace BlazorWebRtc_Application.Services
                 Message = result ? "Arkadaşlık isteği başarıyla gönderildi" : "Arkadaşlık isteği gönderilemedi"
             };
         }
+
+        public async Task<BaseResponseModel> DeleteFriendship(DeleteFriendshipCommand command)
+        {
+            var result = await mediator.Send(command);
+            return new BaseResponseModel
+            {
+                IsSuccess = result,
+                Message = result ? "Arkadaşlık isteği başarıyla gönderildi" : "Arkadaşlık isteği gönderilemedi"
+            };
+        }
     }
 }

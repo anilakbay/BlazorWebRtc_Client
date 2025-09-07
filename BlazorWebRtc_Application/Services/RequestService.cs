@@ -1,4 +1,5 @@
 ﻿using BlazorWebRtc_Application.Features.Commands.RequestFeature;
+using BlazorWebRtc_Application.Features.Commands.UserFriendFeature;
 using BlazorWebRtc_Application.Features.Queries.RequestFeature;
 using BlazorWebRtc_Application.Interface.Services;
 using BlazorWebRtc_Application.Models;
@@ -10,8 +11,10 @@ namespace BlazorWebRtc_Application.Services
     {
         private readonly IMediator _mediator;
         private readonly BaseResponseModel _responseModel;
-        public RequestService(IMediator mediator, BaseResponseModel responseModel)
+        private readonly IUserFriendService _userFriendService;
+        public RequestService(IMediator mediator, IUserFriendService userFriendService, BaseResponseModel responseModel)
         {
+            _userFriendService = userFriendService;
             _responseModel = responseModel;
             _mediator = mediator;
         }
@@ -42,6 +45,29 @@ namespace BlazorWebRtc_Application.Services
             _responseModel.isSuccess = false;
             return _responseModel;
 
+        }
+
+        public async Task<BaseResponseModel> UpdateRequest(RequestCommand command)
+        {
+            var result = await _mediator.Send(command);
+            if(result == null)
+            {
+                _responseModel.isSuccess = false;
+                return _responseModel;
+            }
+
+            UserFriendCommand userFriendCommand = new();
+            userFriendCommand.RequesterId = result.SenderUserId();
+            userFriendCommand.ReceiverUserId = result.ReceiverUserId();
+
+            var response = await _userFriendService.AddFriendship(userFriendCommand);
+            if (response.isSuccess)
+            {
+                _responseModel.isSuccess = false;
+                return _responseModel;
+            }
+            _responseModel.isSuccess = false;
+            return _responseModel;
         }
     }
 }

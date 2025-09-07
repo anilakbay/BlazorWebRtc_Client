@@ -19,5 +19,11 @@ namespace BlazorWebRtc_Api.Controllers
         {
             return Ok(await _userFriendService.AddFriendship(command));
         }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteUserFriend(DeleteFriendshipCommand command)
+        {
+            return Ok(await _userFriendService.DeleteFriendship(command));
+        }
     }
 }

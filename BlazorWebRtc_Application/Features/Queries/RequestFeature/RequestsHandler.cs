@@ -1,5 +1,4 @@
-﻿using BlazorWebRtc_Domain;
-using BlazorWebRtc_Persistence.Context;
+﻿using BlazorWebRtc_Persistence.Context;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using BlazorWebRtc_Application.DTO.Request;
@@ -19,8 +18,8 @@ namespace BlazorWebRtc_Application.Features.Queries.RequestFeature
         {
             var requests = await _context.Requests
                 .Include(r => r.SenderUser)
-                .Where(x => x.ReceiverUserId == request.UserId)
-                .ToListAsync(cancellationToken);
+                .Where(x => x.ReceiverUserId == request.UserId && x.Status == BlazorWebRtc_Domain.Status.pending)
+                .ToListAsync();
 
             var requestList = new List<GetRequestDTO>();
 
@@ -35,7 +34,13 @@ namespace BlazorWebRtc_Application.Features.Queries.RequestFeature
                 requestList.Add(dto);
             }
 
-            return requestList;
+            if (requestList.Any())
+            {
+                return requestList;
+            }
+            return null;
+
         }
+        
     }
 }

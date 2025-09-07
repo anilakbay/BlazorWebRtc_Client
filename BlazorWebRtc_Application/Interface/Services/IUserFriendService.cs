@@ -6,5 +6,6 @@ namespace BlazorWebRtc_Application.Interface.Services
     public interface IUserFriendService
     {
         Task<BaseResponseModel> AddFriendship(UserFriendCommand command);
+        Task<BaseResponseModel> DeleteFriendship(DeleteFriendshipCommand command);
     }
 }
