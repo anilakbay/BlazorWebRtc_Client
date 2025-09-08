@@ -21,17 +21,16 @@ namespace BlazorWebRtc_Application.Features.Queries.RequestFeature
                 .Where(x => x.ReceiverUserId == request.UserId && x.Status == BlazorWebRtc_Domain.Status.pending)
                 .ToListAsync();
 
-            var requestList = new List<GetRequestDTO>();
+            List<GetRequestDTO> requestList = new();
 
             foreach (var item in requests)
             {
-                var dto = new GetRequestDTO
-                {
-                    UserId = item.SenderUser.Id.ToString(),
-                    Email = item.SenderUser.Email,
-                    ProfilePicture = item.SenderUser.ProfilePicture
-                };
-                requestList.Add(dto);
+                GetRequestDTO requestDTO = new();
+                requestDTO.ProfilePicture = item.SenderUser.ProfilePicture;
+                requestDTO.UserName = item.SenderUser.UserName;
+                requestDTO.Email = item.SenderUser.Email;
+                requestDTO.UserId = item.SenderUserId;
+                requestList.Add(requestDTO );
             }
 
             if (requestList.Any())

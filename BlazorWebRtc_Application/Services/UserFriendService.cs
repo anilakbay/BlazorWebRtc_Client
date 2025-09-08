@@ -1,4 +1,6 @@
-﻿using BlazorWebRtc_Application.Features.Commands.UserFriendFeature;
+﻿using Azure;
+using BlazorWebRtc_Application.Features.Commands.UserFriendFeature;
+using BlazorWebRtc_Application.Features.Queries.UserFriend;
 using BlazorWebRtc_Application.Interface.Services;
 using BlazorWebRtc_Application.Models;
 using MediatR;
@@ -32,6 +34,14 @@ namespace BlazorWebRtc_Application.Services
                 IsSuccess = result,
                 Message = result ? "Arkadaşlık isteği başarıyla gönderildi" : "Arkadaşlık isteği gönderilemedi"
             };
+        }
+
+        public Task<BaseResponseModel> GetFriendshipList(UserFriendListQuery query)
+        {
+            var result = mediator.Send(query);
+            responseModel.isSuccess = true;
+            responseModel.Data = result;
+            return responseModel;
         }
     }
 }

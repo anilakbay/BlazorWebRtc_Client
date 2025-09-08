@@ -6,63 +6,40 @@ using MediatR;
 
 namespace BlazorWebRtc_Application.Services
 {
-    /// <summary>
-    /// Kullanıcı hesap işlemlerini (giriş/kayıt) yöneten servis sınıfı.
-    /// IMediator aracılığıyla komutları ilgili handler'lara iletir.
-    /// </summary>
     public class AccountService : IAccountService
     {
-        private readonly IMediator _mediator;
-
-        /// <summary>
-        /// Servis metodlarından dönecek standart yanıt modeli
-        /// </summary>
-        public AccountService(IMediator mediator)
+        private readonly IMediator mediator;
+        private readonly BaseResponseModel _responseModel;
+        public AccountService(IMediator mediator, BaseResponseModel responseModel)
         {
-            _mediator = mediator;
+            this.mediator = mediator;
+            _responseModel = responseModel;
         }
 
-        /// <summary>
-        /// Kullanıcı giriş işlemi.
-        /// </summary>
-        /// <param name="command">LoginCommand ile kullanıcı bilgileri</param>
-        /// <returns>BaseResponseModel, giriş sonucu ve token bilgisi</returns>
         public async Task<BaseResponseModel> SignIn(LoginCommand command)
         {
-            // Giriş isteğini handler’a gönderiyoruz (Tuple<bool, string> dönüyor)
-            var response = await _mediator.Send(command);
-
-            var result = new BaseResponseModel();
-
-            if (response.Item1) // Giriş başarılıysa
+            var response = await mediator.Send(command);
+            if (response.Item1)
             {
-                result.IsSuccess = true;
-                result.Data = response.Item2; // Token bilgisi
+                _responseModel.isSuccess = true;
+                _responseModel.Data = response.Item2;
+                return _responseModel;
             }
-            else // Giriş başarısızsa
-            {
-                result.IsSuccess = false;
-            }
-
-            return result;
+            _responseModel.isSuccess = false;
+            return _responseModel;
         }
 
-        /// <summary>
-        /// Kullanıcı kayıt işlemi.
-        /// </summary>
-        /// <param name="command">RegisterCommand ile kayıt bilgileri</param>
-        /// <returns>BaseResponseModel, kayıt işleminin sonucu</returns>
         public async Task<BaseResponseModel> SignUp(RegisterCommand command)
         {
-            // Kayıt isteğini handler’a gönderiyoruz
-            var response = await _mediator.Send(command);
-
-            var result = new BaseResponseModel
+            var response = await mediator.Send(command);
+            if (response != null)
             {
-                IsSuccess = response != null // null değilse kayıt başarılı
-            };
-
-            return result;
+                _responseModel.isSuccess = true;
+                _responseModel.Data = response;
+                return _responseModel;
+            }
+            _responseModel.isSuccess = false;
+            return _responseModel;
         }
     }
 }

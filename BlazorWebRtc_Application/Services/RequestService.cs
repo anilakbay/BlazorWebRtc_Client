@@ -1,4 +1,5 @@
 ﻿using BlazorWebRtc_Application.Features.Commands.RequestFeature;
+using BlazorWebRtc_Application.Features.Commands.RequestFeature.Update;
 using BlazorWebRtc_Application.Features.Commands.UserFriendFeature;
 using BlazorWebRtc_Application.Features.Queries.RequestFeature;
 using BlazorWebRtc_Application.Interface.Services;
@@ -19,14 +20,16 @@ namespace BlazorWebRtc_Application.Services
             _mediator = mediator;
         }
 
-        public async Task<BaseResponseModel> GetRequests(RequestsQuery query)
+        public async Task<BaseResponseModel> GetRequestList(RequestsQuery query)
         {
             var result = await _mediator.Send(query);
             if (result == null)
             {
-                _responseModel.isSuccess = false;    
+
+                _responseModel.isSuccess = false;
                 return _responseModel;
             }
+
             _responseModel.isSuccess = true;
             _responseModel.Data = result;
             return _responseModel;
@@ -35,39 +38,42 @@ namespace BlazorWebRtc_Application.Services
         public async Task<BaseResponseModel> SendRequest(RequestCommand command)
         {
             var result = await _mediator.Send(command);
-
             if (result)
             {
                 _responseModel.isSuccess = true;
                 return _responseModel;
-
             }
+
             _responseModel.isSuccess = false;
             return _responseModel;
-
         }
 
-        public async Task<BaseResponseModel> UpdateRequest(RequestCommand command)
+        public async Task<BaseResponseModel> UpdateRequest(UpdateRequestCommand command)
         {
             var result = await _mediator.Send(command);
-            if(result == null)
+            if (result == null)
             {
+
                 _responseModel.isSuccess = false;
                 return _responseModel;
             }
-
-            UserFriendCommand userFriendCommand = new();
-            userFriendCommand.RequesterId = result.SenderUserId();
-            userFriendCommand.ReceiverUserId = result.ReceiverUserId();
-
-            var response = await _userFriendService.AddFriendship(userFriendCommand);
-            if (response.isSuccess)
+            if (command.Status == BlazorWebRtc_Domain.Status.accept)
             {
-                _responseModel.isSuccess = false;
-                return _responseModel;
+                UserFriendCommand userFriendCommand = new();
+                userFriendCommand.RequesterId = result.SenderUserId;
+                userFriendCommand.ReceiverUserId = result.ReceiverUserId;
+
+                var response = await _userFriendService.AddFriendship(userFriendCommand);
+                if (response.isSuccess)
+                {
+                    _responseModel.isSuccess = true;
+                    return _responseModel;
+                }
             }
+
             _responseModel.isSuccess = false;
             return _responseModel;
+
         }
     }
 }

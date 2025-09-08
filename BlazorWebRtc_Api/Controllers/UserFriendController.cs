@@ -1,5 +1,7 @@
 ﻿using BlazorWebRtc_Application.Features.Commands.UserFriendFeature;
+using BlazorWebRtc_Application.Features.Queries.UserFriend;
 using BlazorWebRtc_Application.Interface.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorWebRtc_Api.Controllers
@@ -24,6 +26,14 @@ namespace BlazorWebRtc_Api.Controllers
         public async Task<IActionResult> DeleteUserFriend(DeleteFriendshipCommand command)
         {
             return Ok(await _userFriendService.DeleteFriendship(command));
+        }
+
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> GetFriendship()
+        {
+            UserFriendListQuery query = new UserFriendListQuery();
+            return Ok(await _userFriendService.GetFriendshipList(query));
         }
     }
 }

@@ -1,6 +1,9 @@
-﻿namespace BlazorWebRtc_Application.DTO.Request
+﻿using BlazorWebRtc_Domain;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace BlazorWebRtc_Application.DTO.UserFriend
 {
-    public class GetRequestDTO
+    public class UserFriendDTO
     {
         public Guid UserId { get; set; }
         public string UserName { get; set; }

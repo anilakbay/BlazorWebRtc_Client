@@ -6,7 +6,7 @@ namespace BlazorWebRtc_Domain
     public class UserFriend: BaseEntity
     {
         [ForeignKey(nameof(Requester))]
-        public Guid? RequesterId { get; set; }
+        public Guid RequesterId { get; set; }
         public User Requester { get; set; }
         [ForeignKey(nameof(ReceiverUser))]
         public Guid ReceiverUserId { get; set; }
