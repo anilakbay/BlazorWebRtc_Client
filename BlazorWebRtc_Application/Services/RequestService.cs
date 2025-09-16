@@ -11,12 +11,10 @@ namespace BlazorWebRtc_Application.Services
     public class RequestService : IRequestService
     {
         private readonly IMediator _mediator;
-        private readonly BaseResponseModel _responseModel;
         private readonly IUserFriendService _userFriendService;
-        public RequestService(IMediator mediator, IUserFriendService userFriendService, BaseResponseModel responseModel)
+        public RequestService(IMediator mediator, IUserFriendService userFriendService)
         {
             _userFriendService = userFriendService;
-            _responseModel = responseModel;
             _mediator = mediator;
         }
 
@@ -27,14 +25,14 @@ namespace BlazorWebRtc_Application.Services
             {
                 return new BaseResponseModel
                 {
-                    isSuccess = false,
+                    IsSuccess = false,
                     Message = "No requests found"
                 };
             }
 
             return new BaseResponseModel
             {
-                isSuccess = true,
+                IsSuccess = true,
                 Data = result,
                 Message = "Requests retrieved successfully"
             };
@@ -47,14 +45,14 @@ namespace BlazorWebRtc_Application.Services
             {
                 return new BaseResponseModel
                 {
-                    isSuccess = true,
+                    IsSuccess = true,
                     Message = "Request sent successfully"
                 };
             }
 
             return new BaseResponseModel
             {
-                isSuccess = false,
+                IsSuccess = false,
                 Message = "Failed to send request"
             };
         }
@@ -77,7 +75,7 @@ namespace BlazorWebRtc_Application.Services
             {
                 return new BaseResponseModel
                 {
-                    isSuccess = false,
+                    IsSuccess = false,
                     Message = "Request not found"
                 };
             }
@@ -89,11 +87,11 @@ namespace BlazorWebRtc_Application.Services
                 userFriendCommand.ReceiverUserId = result.ReceiverUserId;
 
                 var response = await _userFriendService.AddFriendship(userFriendCommand);
-                if (response.isSuccess)
+                if (response.IsSuccess)
                 {
                     return new BaseResponseModel
                     {
-                        isSuccess = true,
+                        IsSuccess = true,
                         Message = "Request accepted and friendship added"
                     };
                 }
@@ -101,30 +99,11 @@ namespace BlazorWebRtc_Application.Services
 
             return new BaseResponseModel
             {
-                isSuccess = true,
+                IsSuccess = true,
                 Message = "Request updated successfully"
             };
         }
 
-        public async Task<BaseResponseModel> GetRequests(RequestsQuery query)
-        {
-            var result = await _mediator.Send(query);
-            if (result == null)
-            {
-                return new BaseResponseModel
-                {
-                    isSuccess = false,
-                    Message = "No requests found"
-                };
-            }
-
-            return new BaseResponseModel
-            {
-                isSuccess = true,
-                Data = result,
-                Message = "Requests retrieved successfully"
-            };
-        }
 
     }
 }

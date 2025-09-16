@@ -1,270 +1,272 @@
 ﻿@page "/"
-@using System.Net.Http
-@using System.Net.Http.Json
-@using Microsoft.AspNetCore.Components.Forms
-@using Microsoft.AspNetCore.Components.Routing
-@using Microsoft.AspNetCore.Components.Web
-@using Microsoft.AspNetCore.Components.Web.Virtualization
-@using Microsoft.AspNetCore.Components.WebAssembly.Http
-@using Microsoft.JSInterop
-@using BlazorWebRtc_Client
-@using BlazorWebRtc_Client.Layout
-@using BlazorWebRtc_Client.Shared
-@using BlazorWebRtc_Application.DTO
-@using BlazorWebRtc_Application.Features.Commands.RequestFeature
-@using BlazorWebRtc_Application.Interface.Services
-@using BlazorWebRtc_Domain
+@layout MainLayout
 
-@inject IJSRuntime JS
-@inject IRequestService requestService
-@inject IUserService userInfoService
+<PageTitle>Friendship App - Connect with Friends</PageTitle>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Friendship App</title>
-    <style>
-        body {
-            background-color: #f0f8ff;
-            color: #333;
-        }
-
-        .banner {
-            text-align: center;
-            background: url('https://www.infosys.com/content/dam/infosys-web/en/australia/digital-accessibility-journey/images/people-holding-speech-bubbles.png') no-repeat center center;
-            background-size: cover;
-            padding: 4rem 0;
-            color: white;
-        }
-
-            .banner h1 {
-                font-size: 2.5rem;
-                margin-bottom: 1rem;
-            }
-
-            .banner button {
-                background-color: #28a745;
-                color: white;
-                border: none;
-                padding: 0.75rem 1.5rem;
-                font-size: 1rem;
-                cursor: pointer;
-                border-radius: 5px;
-            }
-
-                .banner button:hover {
-                    background-color: #218838;
-                }
-
-        .suggested-friends {
-            padding: 2rem;
-            text-align: center;
-        }
-
-            .suggested-friends h2 {
-                font-size: 2rem;
-                margin-bottom: 2rem;
-            }
-
-        .friend-card {
-            display: inline-block;
-            width: 200px;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            margin: 1rem;
-            padding: 1rem;
-            text-align: center;
-        }
-
-            .friend-card img {
-                border-radius: 50%;
-                width: 100px;
-                height: 100px;
-                margin-bottom: 1rem;
-            }
-
-            .friend-card h3 {
-                font-size: 1.25rem;
-                margin-bottom: 0.5rem;
-            }
-
-            .friend-card p {
-                font-size: 0.9rem;
-                color: #666;
-            }
-
-        .btn-success {
-            background-color: #28a745;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: ease;
-        }
-
-            .btn-success:hover {
-                background-color: #218838;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            }
-
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .modal-content {
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            max-width: 500px;
-            width: 100%;
-            text-align: center;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-
-            .modal-content img {
-                width: 100px;
-                height: 100px;
-                border-radius: 50%;
-                margin-bottom: 15px;
-            }
-
-            .modal-content h2 {
-                margin-bottom: 15px;
-            }
-
-            .modal-content p {
-                margin-bottom: 20px;
-            }
-
-        .btn-danger {
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-            .btn-danger:hover {
-                background-color: #c82333;
-            }
-
-        .btn-warning {
-            background-color: #ffc107;
-            color: #212529;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-            .btn-warning:hover {
-                background-color: #e0a800;
-            }
-    </style>
-</head>
-<body>
-    <body>
-        <header>
-            <nav>
-                <ul>
-                    <li><a href="#">Home</a></li>
-                    <li><a href="#">Discover</a></li>
-                    <li><a href="#">Messages</a></li>
-                    <li><a href="#">Notifications</a></li>
-                    <li><a href="#">Profile</a></li>
-                </ul>
-            </nav>
-        </header>
-
-        <section class="banner">
-            <h1>Welcome to Friendship App</h1>
-            <button>Find New Friends</button>
-        </section>
-
-        <section class="suggested-friends">
-            <h2>Suggested Friends</h2>
-            <div class="friend-card">
-                <img src="https://via.placeholder.com/150" alt="Friend 1">
-                <h3>John Doe</h3>
-                <p>Love hiking and exploring new places.</p>
-            </div>
-            <div class="friend-card">
-                <img src="https://via.placeholder.com/150" alt="Friend 2">
-                <h3>Jane Smith</h3>
-                <p>Coffee enthusiast and avid reader.</p>
-            </div>
-            <div class="friend-card">
-                <img src="https://via.placeholder.com/150" alt="Friend 3">
-                <h3>Sam Brown</h3>
-                <p>Always up for a good conversation.</p>
-            </div>
-        </section>
-    </body>
-</body>
-</html>
-
-@code {
-    private List<UserDTOResponseModel> responseDtoModel = new();
-    private UserDTOResponseModel selectedDTO = new();
-    private bool isModalVisible = false;
-
-    private void OpenModal(UserDTOResponseModel dto)
-    {
-        selectedDTO = dto;
-        isModalVisible = true;
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 5rem 2rem;
+        text-align: center;
+        color: white;
+        position: relative;
+        overflow: hidden;
     }
 
-    private async Task SendRequest()
-    {
-        if (selectedDTO == null) return;
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/><circle cx="10" cy="60" r="0.5" fill="white" opacity="0.1"/><circle cx="90" cy="40" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+        opacity: 0.3;
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 1;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .hero-section h1 {
+        font-size: 3.5rem;
+        margin-bottom: 1.5rem;
+        font-weight: 700;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        line-height: 1.2;
+    }
+
+    .hero-section p {
+        font-size: 1.3rem;
+        margin-bottom: 2.5rem;
+        opacity: 0.9;
+        line-height: 1.6;
+    }
+
+    .cta-button {
+        background: linear-gradient(45deg, #28a745, #20c997);
+        color: white;
+        border: none;
+        padding: 1rem 2.5rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        border-radius: 50px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .cta-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+        background: linear-gradient(45deg, #218838, #1ea085);
+    }
+
+    .features-section {
+        padding: 4rem 2rem;
+        background: #f8f9fa;
+    }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .feature-card {
+        background: white;
+        padding: 2.5rem;
+        border-radius: 15px;
+        text-align: center;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .feature-icon {
+        font-size: 3rem;
+        margin-bottom: 1.5rem;
+        color: #667eea;
+    }
+
+    .feature-card h3 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        color: #333;
+    }
+
+    .feature-card p {
+        color: #666;
+        line-height: 1.6;
+    }
+
+    .suggested-friends {
+        padding: 4rem 2rem;
+        background: white;
+    }
+
+    .section-title {
+        text-align: center;
+        font-size: 2.5rem;
+        margin-bottom: 3rem;
+        color: #333;
+        position: relative;
+    }
+
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 4px;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        border-radius: 2px;
+    }
+
+    .friends-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .friend-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        text-align: center;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        border: 1px solid #f0f0f0;
+    }
+
+    .friend-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+    }
+
+    .friend-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        margin: 0 auto 1.5rem;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: white;
+        font-weight: bold;
+    }
+
+    .friend-card h3 {
+        font-size: 1.4rem;
+        margin-bottom: 0.8rem;
+        color: #333;
+    }
+
+    .friend-card p {
+        color: #666;
+        line-height: 1.5;
+        margin-bottom: 1.5rem;
+    }
+
+    .friend-button {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        padding: 0.8rem 1.5rem;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+
+    .friend-button:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    @@media (max-width: 768px) {
+        .hero-section h1 {
+            font-size: 2.5rem;
+        }
         
-        var sendCommand = new RequestFriendShipCommand
-        {
-            ReceiverUserId = selectedDTO.UserId,
-            Status = Status.pending
-        };
-
-        var result = await requestService.SendFriendshipRequest(sendCommand);
-
-        if (result.IsSuccess)
-        {
-            await JS.InvokeVoidAsync("toastrNotify", "success", "Friendship request sent", "Success Process");
+        .hero-section p {
+            font-size: 1.1rem;
         }
-
-        CloseModal();
-    }
-
-    private void CloseModal()
-    {
-        isModalVisible = false;
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        responseDtoModel = await userInfoService.GetUserList();
-    }
-
-    private string GetProfilePicture(string? profilePicturePath)
-    {
-        if (string.IsNullOrEmpty(profilePicturePath))
-            return "https://via.placeholder.com/100x100?text=No+Image";
         
-        return $"https://192.168.1.190:7282/{profilePicturePath}";
+        .features-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .friends-grid {
+            grid-template-columns: 1fr;
+        }
     }
-}
+</style>
+
+<section class="hero-section">
+    <div class="hero-content">
+        <h1>Connect with Amazing People</h1>
+        <p>Discover new friendships, share experiences, and build meaningful connections in our vibrant community.</p>
+        <button class="cta-button">Start Your Journey</button>
+    </div>
+</section>
+
+<section class="features-section">
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon">👥</div>
+            <h3>Find Friends</h3>
+            <p>Discover people with similar interests and hobbies. Our smart algorithm helps you connect with the right people.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">💬</div>
+            <h3>Chat & Connect</h3>
+            <p>Start conversations, share moments, and build lasting relationships through our secure messaging platform.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🎉</div>
+            <h3>Join Events</h3>
+            <p>Participate in community events, meetups, and activities to expand your social circle and have fun.</p>
+        </div>
+    </div>
+</section>
+
+<section class="suggested-friends">
+    <h2 class="section-title">Meet New People</h2>
+    <div class="friends-grid">
+        <div class="friend-card">
+            <div class="friend-avatar">JD</div>
+            <h3>John Doe</h3>
+            <p>Adventure enthusiast who loves hiking, photography, and exploring new places. Always up for outdoor activities!</p>
+            <button class="friend-button">Connect</button>
+        </div>
+        <div class="friend-card">
+            <div class="friend-avatar">JS</div>
+            <h3>Jane Smith</h3>
+            <p>Coffee lover, bookworm, and travel blogger. Passionate about culture, art, and meaningful conversations.</p>
+            <button class="friend-button">Connect</button>
+        </div>
+        <div class="friend-card">
+            <div class="friend-avatar">SB</div>
+            <h3>Sam Brown</h3>
+            <p>Tech enthusiast, music producer, and fitness coach. Loves sharing knowledge and helping others grow.</p>
+            <button class="friend-button">Connect</button>
+        </div>
+    </div>
+</section>

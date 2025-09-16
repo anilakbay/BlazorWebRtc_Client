@@ -21,24 +21,24 @@ namespace BlazorWebRtc_Application.Services
             var response = await mediator.Send(command);
             if (response.Item1)
             {
-                _responseModel.isSuccess = true;
+                _responseModel.IsSuccess = true;
                 _responseModel.Data = response.Item2;
                 return _responseModel;
             }
-            _responseModel.isSuccess = false;
+            _responseModel.IsSuccess = false;
             return _responseModel;
         }
 
         public async Task<BaseResponseModel> SignUp(RegisterCommand command)
         {
             var response = await mediator.Send(command);
-            if (response != null)
+            if (response != Guid.Empty)
             {
-                _responseModel.isSuccess = true;
+                _responseModel.IsSuccess = true;
                 _responseModel.Data = response;
                 return _responseModel;
             }
-            _responseModel.isSuccess = false;
+            _responseModel.IsSuccess = false;
             return _responseModel;
         }
     }

@@ -38,10 +38,10 @@ namespace BlazorWebRtc_Application.Features.Commands.Account.Login
         // JWT token üretme metodu, Bind kullanmadan
         private string GenerateJwtToken(User user)
         {
-            // appsettings.json’dan direkt değer alıyoruz
-            string secretKey = _configuration["JwtSettings:SecretKey"];
-            string issuer = _configuration["JwtSettings:Issuer"];
-            string audience = _configuration["JwtSettings:Audience"];
+            // appsettings.json'dan direkt değer alıyoruz
+            string secretKey = _configuration["JwtSettings:SecretKey"] ?? "default-secret-key";
+            string issuer = _configuration["JwtSettings:Issuer"] ?? "default-issuer";
+            string audience = _configuration["JwtSettings:Audience"] ?? "default-audience";
             int expirationMinutes = int.Parse(_configuration["JwtSettings:ExpirationMinutes"] ?? "60");
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));

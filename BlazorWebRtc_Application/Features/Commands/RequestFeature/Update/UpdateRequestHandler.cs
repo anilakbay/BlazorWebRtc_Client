@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BlazorWebRtc_Application.Features.Commands.RequestFeature.Update
 {
-    public class UpdateRequestHandler : IRequestHandler<UpdateRequestCommand, Request>
+    public class UpdateRequestHandler : IRequestHandler<UpdateRequestCommand, Request?>
     {
         private readonly AppDbContext _context;
         public UpdateRequestHandler(AppDbContext context)
@@ -13,9 +13,15 @@ namespace BlazorWebRtc_Application.Features.Commands.RequestFeature.Update
             _context = context;
         }
 
-        public async Task<Request> Handle(UpdateRequestCommand request, CancellationToken cancellationToken)
+        public async Task<Request?> Handle(UpdateRequestCommand request, CancellationToken cancellationToken)
         {
             var requestObj = await _context.Requests.FirstOrDefaultAsync(x=>x.Id == request.RequestId);
+            
+            if (requestObj == null)
+            {
+                return null;
+            }
+            
             requestObj.Status = request.status;
             if (await _context.SaveChangesAsync() > 0)
             {

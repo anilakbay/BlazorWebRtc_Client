@@ -7,10 +7,10 @@ namespace BlazorWebRtc_Domain
     {
         [ForeignKey(nameof(Requester))]
         public Guid RequesterId { get; set; }
-        public User Requester { get; set; }
+        public User? Requester { get; set; }
         [ForeignKey(nameof(ReceiverUser))]
         public Guid ReceiverUserId { get; set; }
-        public User ReceiverUser { get; set; }  
+        public User? ReceiverUser { get; set; }  
         // public virtual List<User>Users { get; set; }
     }
 }

@@ -9,8 +9,7 @@ namespace BlazorWebRtc_Application.Interface.Services
     {
         Task<BaseResponseModel> SendRequest(RequestCommand command);
         Task<BaseResponseModel> SendFriendshipRequest(RequestFriendShipCommand command);
-        Task<BaseResponseModel> GetRequests(RequestsQuery query);
-        Task<BaseResponseModel> UpdateRequest(UpdateRequestCommand command);
         Task<BaseResponseModel> GetRequestList(RequestsQuery query);
+        Task<BaseResponseModel> UpdateRequest(UpdateRequestCommand command);
     }
 }

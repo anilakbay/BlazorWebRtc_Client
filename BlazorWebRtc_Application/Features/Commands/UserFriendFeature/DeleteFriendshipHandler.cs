@@ -17,6 +17,11 @@ namespace BlazorWebRtc_Application.Features.Commands.UserFriendFeature
         {
             var userFriend = await _context.UserFriends.FirstOrDefaultAsync(x => x.Id == request.Id);
 
+            if (userFriend == null)
+            {
+                return false;
+            }
+
             _context.UserFriends.Remove(userFriend);
 
             if (await _context.SaveChangesAsync() > 0)

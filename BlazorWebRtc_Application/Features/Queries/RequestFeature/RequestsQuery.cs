@@ -4,7 +4,7 @@ using MediatR;
 
 namespace BlazorWebRtc_Application.Features.Queries.RequestFeature
 {
-    public class RequestsQuery: IRequest<List<GetRequestDTO>>
+    public class RequestsQuery: IRequest<List<GetRequestDTO>?>
     {
         public Guid UserId { get; set; }      
     }

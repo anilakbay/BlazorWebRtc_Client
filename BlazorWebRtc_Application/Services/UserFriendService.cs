@@ -1,5 +1,4 @@
-﻿using Azure;
-using BlazorWebRtc_Application.Features.Commands.UserFriendFeature;
+﻿using BlazorWebRtc_Application.Features.Commands.UserFriendFeature;
 using BlazorWebRtc_Application.Features.Queries.UserFriend;
 using BlazorWebRtc_Application.Interface.Services;
 using BlazorWebRtc_Application.Models;
@@ -32,7 +31,7 @@ namespace BlazorWebRtc_Application.Services
             return new BaseResponseModel
             {
                 IsSuccess = result,
-                Message = result ? "Arkadaşlık isteği başarıyla gönderildi" : "Arkadaşlık isteği gönderilemedi"
+                Message = result ? "Arkadaşlık silindi" : "Arkadaşlık silinemedi"
             };
         }
 
@@ -41,7 +40,7 @@ namespace BlazorWebRtc_Application.Services
             var result = await mediator.Send(query);
             return new BaseResponseModel
             {
-                isSuccess = true,
+                IsSuccess = true,
                 Data = result
             };
         }

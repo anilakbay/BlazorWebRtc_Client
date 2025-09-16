@@ -14,9 +14,9 @@ namespace BlazorWebRtc_Domain
         public Status Status { get; set; } = Status.pending;
         [ForeignKey(nameof(SenderUser))]
         public Guid SenderUserId { get; set; }
-        public User SenderUser { get; set; }
+        public User? SenderUser { get; set; }
         [ForeignKey(nameof(ReceiverUser))]
         public Guid ReceiverUserId { get; set; }
-        public User ReceiverUser { get; set; }
+        public User? ReceiverUser { get; set; }
     }
 }

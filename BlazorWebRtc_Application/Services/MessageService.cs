@@ -18,13 +18,13 @@ namespace BlazorWebRtc_Application.Services
         public async Task<BaseResponseModel> SendMessage(SendMessageCommand command)
         {
             var response = await mediator.Send(command);
-            if (response != null)
+            if (response)
             {
-                _responseModel.isSuccess = true;
+                _responseModel.IsSuccess = true;
                 _responseModel.Data = response;
                 return _responseModel;
             }
-            _responseModel.isSuccess = false;
+            _responseModel.IsSuccess = false;
             return _responseModel;
         }
     }

@@ -27,7 +27,12 @@ namespace BlazorWebRtc_Application.Features.Commands.RequestFeature
 
             if (result is not null)
             {
-                userId = _contextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                userId = _contextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return false;
+                }
 
                 var requests = await _context.Requests.Where(x => x.ReceiverUserId == request.ReceiverUserId).ToListAsync();
 

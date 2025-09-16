@@ -9,10 +9,8 @@ namespace BlazorWebRtc_Application.Services
     public class UserService : IUserService
     {
         private readonly IMediator _mediator;
-        private readonly BaseResponseModel _responseModel;
-        public UserService(IMediator mediator, BaseResponseModel responseModel)
+        public UserService(IMediator mediator)
         {
-            _responseModel = responseModel;
             _mediator = mediator;
         }
 
