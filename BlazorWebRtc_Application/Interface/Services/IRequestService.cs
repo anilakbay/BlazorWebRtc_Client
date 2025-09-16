@@ -8,9 +8,9 @@ namespace BlazorWebRtc_Application.Interface.Services
     public interface IRequestService
     {
         Task<BaseResponseModel> SendRequest(RequestCommand command);
+        Task<BaseResponseModel> SendFriendshipRequest(RequestFriendShipCommand command);
         Task<BaseResponseModel> GetRequests(RequestsQuery query);
-        Task<BaseResponseModel> UpdateRequest(RequestCommand command);
-        Task<object?> GetRequestList(RequestsQuery query);
-        Task<object?> UpdateRequest(UpdateRequestCommand command);
+        Task<BaseResponseModel> UpdateRequest(UpdateRequestCommand command);
+        Task<BaseResponseModel> GetRequestList(RequestsQuery query);
     }
 }

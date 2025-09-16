@@ -7,8 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="wwwroot\css\Index.css" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.19" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.19" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="8.0.19" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BlazorWebRtc_Application\BlazorWebRtc_Application.csproj" />
   </ItemGroup>
 
 </Project>

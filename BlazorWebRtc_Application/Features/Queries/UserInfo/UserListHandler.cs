@@ -8,7 +8,7 @@ using System.Security.Claims;
 
 namespace BlazorWebRtc_Application.Features.Queries.UserInfo
 {
-    public class UserListHandler : IRequestHandler<UserListQuery, List<UserDTO>>
+    public class UserListHandler : IRequestHandler<UserListQuery, List<UserDTOResponseModel>>
     {
         private readonly AppDbContext _context;
         private readonly IHttpContextAccessor _contextAccessor;
@@ -20,7 +20,7 @@ namespace BlazorWebRtc_Application.Features.Queries.UserInfo
         }
 
         // Kullanıcı listesi sorgusu
-        public async Task<List<UserDTO>> Handle(UserListQuery request, CancellationToken cancellationToken)
+        public async Task<List<UserDTOResponseModel>> Handle(UserListQuery request, CancellationToken cancellationToken)
         {
             // Tüm kullanıcıları getir
             List<User> users = await _context.Users.ToListAsync(cancellationToken);
@@ -28,7 +28,7 @@ namespace BlazorWebRtc_Application.Features.Queries.UserInfo
             // Mevcut kullanıcı ID'si
             var currentUserId = _contextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            List<UserDTO> userDTOs = new List<UserDTO>();
+            List<UserDTOResponseModel> userDTOs = new List<UserDTOResponseModel>();
 
             if (users != null)
             {
@@ -37,7 +37,7 @@ namespace BlazorWebRtc_Application.Features.Queries.UserInfo
                     // Mevcut kullanıcıyı listeye ekleme
                     if (currentUserId != null && currentUserId != item.Id.ToString())
                     {
-                        var dto = new UserDTO
+                        var dto = new UserDTOResponseModel
                         {
                             UserId = item.Id,
                             UserName = item.UserName,

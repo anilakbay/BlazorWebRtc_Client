@@ -36,12 +36,14 @@ namespace BlazorWebRtc_Application.Services
             };
         }
 
-        public Task<BaseResponseModel> GetFriendshipList(UserFriendListQuery query)
+        public async Task<BaseResponseModel> GetFriendshipList(UserFriendListQuery query)
         {
-            var result = mediator.Send(query);
-            responseModel.isSuccess = true;
-            responseModel.Data = result;
-            return responseModel;
+            var result = await mediator.Send(query);
+            return new BaseResponseModel
+            {
+                isSuccess = true,
+                Data = result
+            };
         }
     }
 }

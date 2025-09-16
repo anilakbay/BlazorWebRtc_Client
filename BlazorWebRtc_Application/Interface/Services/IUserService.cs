@@ -1,9 +1,10 @@
-﻿using BlazorWebRtc_Application.Models;
+﻿using BlazorWebRtc_Application.DTO;
+using BlazorWebRtc_Application.Models;
 
 namespace BlazorWebRtc_Application.Interface.Services
 {
     public interface IUserService
     {
-        Task<BaseResponseModel> GetUserList();
+        Task<List<UserDTOResponseModel>> GetUserList();
     }
 }

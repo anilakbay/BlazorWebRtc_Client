@@ -1,11 +1,24 @@
 ﻿@page "/"
-@using BlazorWebRtc_Blazor.Models.Request
-@using BlazorWebRtc_Blazor.Models.Response
-@using BlazorWebRtc_Blazor.Services.Abstract
-@using BlazorWebRtc_Blazor.Shared
-@inject IUserInfoService userInfoService
-@inject IRequestService requestService
+@using System.Net.Http
+@using System.Net.Http.Json
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Web.Virtualization
+@using Microsoft.AspNetCore.Components.WebAssembly.Http
+@using Microsoft.JSInterop
+@using BlazorWebRtc_Client
+@using BlazorWebRtc_Client.Layout
+@using BlazorWebRtc_Client.Shared
+@using BlazorWebRtc_Application.DTO
+@using BlazorWebRtc_Application.Features.Commands.RequestFeature
+@using BlazorWebRtc_Application.Interface.Services
+@using BlazorWebRtc_Domain
+
 @inject IJSRuntime JS
+@inject IRequestService requestService
+@inject IUserService userInfoService
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,14 +26,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Friendship App</title>
     <style>
-
-
         body {
             background-color: #f0f8ff;
             color: #333;
         }
-
-
 
         .banner {
             text-align: center;
@@ -87,19 +96,19 @@
                 color: #666;
             }
 
-            .btn-success {
-                background-color:#28a745;
-                color:#fff;
-                border:none;
-                padding:10px 20px;
-                font-size:16px;
-                cursor:pointer;
-                transition: ease
-            }
+        .btn-success {
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: ease;
+        }
 
-            .btn-success:hover{
-                background-color:#218838;
-                box-shadow:0 4px 12px rgba(0,0,0,0.2)
+            .btn-success:hover {
+                background-color: #218838;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
             }
 
         .modal-overlay {
@@ -155,8 +164,8 @@
             }
 
         .btn-warning {
-            background-color: #FFFF00;
-            color: white;
+            background-color: #ffc107;
+            color: #212529;
             border: none;
             padding: 10px 20px;
             border-radius: 5px;
@@ -165,57 +174,54 @@
         }
 
             .btn-warning:hover {
-                background-color: #FFFF00;
+                background-color: #e0a800;
             }
     </style>
 </head>
 <body>
+    <body>
+        <header>
+            <nav>
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Discover</a></li>
+                    <li><a href="#">Messages</a></li>
+                    <li><a href="#">Notifications</a></li>
+                    <li><a href="#">Profile</a></li>
+                </ul>
+            </nav>
+        </header>
 
-    <Header />
-    <section class="banner">
-        <h1>Welcome to Friendship App</h1>
-        <button>Find New Friends</button>
-    </section>
+        <section class="banner">
+            <h1>Welcome to Friendship App</h1>
+            <button>Find New Friends</button>
+        </section>
 
-    <section class="suggested-friends">
-        <h2>Suggested Friends</h2>
-        
-        @foreach (var friend in responseDtoModel)
-        {
+        <section class="suggested-friends">
+            <h2>Suggested Friends</h2>
             <div class="friend-card">
-                <img src="@GetProfilePicture(friend.ProfilePicture)" alt="Friend 1">
-                <h3>@friend.UserName</h3>
+                <img src="https://via.placeholder.com/150" alt="Friend 1">
+                <h3>John Doe</h3>
                 <p>Love hiking and exploring new places.</p>
-                <button class="btn btn-success"@onclick="()=>OpenModal(friend)" >Detail</button>
             </div>
-        }
-        
-
-
-       @if(isModalVisible)
-        {
-            <div class="modal-overlay" >
-                <div class="modal-content" >
-                    <h2> @selectedDTO.UserName </h2>
-                    <img src="@GetProfilePicture(selectedDTO.ProfilePicture)" />
-                    <p>More details about @selectedDTO.UserName</p>
-                    <button class="btn btn-danger" @onclick="CloseModal">Close Modal</button>
-                    <button class="btn btn-warning" @onclick="SendRequest" >Request Friend</button>
-                </div>
+            <div class="friend-card">
+                <img src="https://via.placeholder.com/150" alt="Friend 2">
+                <h3>Jane Smith</h3>
+                <p>Coffee enthusiast and avid reader.</p>
             </div>
-        }
-   
-    </section>
-
-
-
+            <div class="friend-card">
+                <img src="https://via.placeholder.com/150" alt="Friend 3">
+                <h3>Sam Brown</h3>
+                <p>Always up for a good conversation.</p>
+            </div>
+        </section>
+    </body>
 </body>
 </html>
 
 @code {
-    List<UserDTOResponseModel> responseDtoModel = new List<UserDTOResponseModel>();
-    UserDTOResponseModel selectedDTO = new UserDTOResponseModel();
-
+    private List<UserDTOResponseModel> responseDtoModel = new();
+    private UserDTOResponseModel selectedDTO = new();
     private bool isModalVisible = false;
 
     private void OpenModal(UserDTOResponseModel dto)
@@ -224,21 +230,25 @@
         isModalVisible = true;
     }
 
-
-    private async Task<bool> SendRequest()
+    private async Task SendRequest()
     {
-        RequestFriendShipCommand sendCommand = new RequestFriendShipCommand();
-        sendCommand.ReceiverUserId = selectedDTO.UserId;
-        sendCommand.Status = Status.pending;
-        var result = await requestService.SendFriendshipRequest(sendCommand);
-        if (result.isSuccess)
+        if (selectedDTO == null) return;
+        
+        var sendCommand = new RequestFriendShipCommand
         {
-            await JS.InvokeVoidAsync("toastrNotify", "success", "Friendship request sended", "Success Process");
-        }
-        CloseModal();
-        return result.isSuccess;
-    }
+            ReceiverUserId = selectedDTO.UserId,
+            Status = Status.pending
+        };
 
+        var result = await requestService.SendFriendshipRequest(sendCommand);
+
+        if (result.IsSuccess)
+        {
+            await JS.InvokeVoidAsync("toastrNotify", "success", "Friendship request sent", "Success Process");
+        }
+
+        CloseModal();
+    }
 
     private void CloseModal()
     {
@@ -248,13 +258,13 @@
     protected override async Task OnInitializedAsync()
     {
         responseDtoModel = await userInfoService.GetUserList();
-
-
     }
 
-    private string GetProfilePicture(string profilePicturePath)
+    private string GetProfilePicture(string? profilePicturePath)
     {
+        if (string.IsNullOrEmpty(profilePicturePath))
+            return "https://via.placeholder.com/100x100?text=No+Image";
+        
         return $"https://192.168.1.190:7282/{profilePicturePath}";
     }
-
 }

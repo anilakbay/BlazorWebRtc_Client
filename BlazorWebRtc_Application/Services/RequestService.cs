@@ -25,14 +25,19 @@ namespace BlazorWebRtc_Application.Services
             var result = await _mediator.Send(query);
             if (result == null)
             {
-
-                _responseModel.isSuccess = false;
-                return _responseModel;
+                return new BaseResponseModel
+                {
+                    isSuccess = false,
+                    Message = "No requests found"
+                };
             }
 
-            _responseModel.isSuccess = true;
-            _responseModel.Data = result;
-            return _responseModel;
+            return new BaseResponseModel
+            {
+                isSuccess = true,
+                Data = result,
+                Message = "Requests retrieved successfully"
+            };
         }
 
         public async Task<BaseResponseModel> SendRequest(RequestCommand command)
@@ -40,12 +45,29 @@ namespace BlazorWebRtc_Application.Services
             var result = await _mediator.Send(command);
             if (result)
             {
-                _responseModel.isSuccess = true;
-                return _responseModel;
+                return new BaseResponseModel
+                {
+                    isSuccess = true,
+                    Message = "Request sent successfully"
+                };
             }
 
-            _responseModel.isSuccess = false;
-            return _responseModel;
+            return new BaseResponseModel
+            {
+                isSuccess = false,
+                Message = "Failed to send request"
+            };
+        }
+
+        public async Task<BaseResponseModel> SendFriendshipRequest(RequestFriendShipCommand command)
+        {
+            var requestCommand = new RequestCommand
+            {
+                ReceiverUserId = command.ReceiverUserId,
+                Status = command.Status
+            };
+            
+            return await SendRequest(requestCommand);
         }
 
         public async Task<BaseResponseModel> UpdateRequest(UpdateRequestCommand command)
@@ -53,11 +75,14 @@ namespace BlazorWebRtc_Application.Services
             var result = await _mediator.Send(command);
             if (result == null)
             {
-
-                _responseModel.isSuccess = false;
-                return _responseModel;
+                return new BaseResponseModel
+                {
+                    isSuccess = false,
+                    Message = "Request not found"
+                };
             }
-            if (command.Status == BlazorWebRtc_Domain.Status.accept)
+            
+            if (command.status == BlazorWebRtc_Domain.Status.accepted)
             {
                 UserFriendCommand userFriendCommand = new();
                 userFriendCommand.RequesterId = result.SenderUserId;
@@ -66,14 +91,40 @@ namespace BlazorWebRtc_Application.Services
                 var response = await _userFriendService.AddFriendship(userFriendCommand);
                 if (response.isSuccess)
                 {
-                    _responseModel.isSuccess = true;
-                    return _responseModel;
+                    return new BaseResponseModel
+                    {
+                        isSuccess = true,
+                        Message = "Request accepted and friendship added"
+                    };
                 }
             }
 
-            _responseModel.isSuccess = false;
-            return _responseModel;
-
+            return new BaseResponseModel
+            {
+                isSuccess = true,
+                Message = "Request updated successfully"
+            };
         }
+
+        public async Task<BaseResponseModel> GetRequests(RequestsQuery query)
+        {
+            var result = await _mediator.Send(query);
+            if (result == null)
+            {
+                return new BaseResponseModel
+                {
+                    isSuccess = false,
+                    Message = "No requests found"
+                };
+            }
+
+            return new BaseResponseModel
+            {
+                isSuccess = true,
+                Data = result,
+                Message = "Requests retrieved successfully"
+            };
+        }
+
     }
 }
