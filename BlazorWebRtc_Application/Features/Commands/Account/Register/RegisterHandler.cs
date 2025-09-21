@@ -39,18 +39,19 @@ namespace BlazorWebRtc_Application.Features.Commands.Account.Register
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync(cancellationToken);
-
-            // Profil resmi varsa kaydet
-            if (request.ProfilePicture is not null && request.ProfilePicture.Length > 0)
-            {
-                var imagePath = await SaveProfilePicture(request.ProfilePicture, user.Id);
-                user.ProfilePicture = imagePath;
-                _context.Users.Update(user);
-                await _context.SaveChangesAsync(cancellationToken);
-            }
-
-            // Kullanıcı ID'si her durumda dön
             return user.Id;
+
+            //// Profil resmi varsa kaydet
+            //if (request.ProfilePicture is not null && request.ProfilePicture.Length > 0)
+            //{
+            //    var imagePath = await SaveProfilePicture(request.ProfilePicture, user.Id);
+            //    user.ProfilePicture = imagePath;
+            //    _context.Users.Update(user);
+            //    await _context.SaveChangesAsync(cancellationToken);
+            //}
+
+            //// Kullanıcı ID'si her durumda dön
+            //return user.Id;
         }
 
         // Profil resmi kaydetme metodu

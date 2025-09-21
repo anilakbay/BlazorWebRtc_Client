@@ -9,7 +9,7 @@ namespace BlazorWebRtc_Application.Features.Commands.Account.Register
         public string Email { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
         public string ConfirmPassword { get; set; } = string.Empty;
-        public IFormFile? ProfilePicture { get; set; } 
+        public string? ProfilePicture { get; set; } 
 
     }
 }

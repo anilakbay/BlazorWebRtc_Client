@@ -1,13 +1,19 @@
 ﻿using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations;
 
 namespace BlazorWebRtc_Client.Models.Request
 {
     public class RegisterCommand
     {
-        public string UserName { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
-        public string ConfirmPassword { get; set; } = string.Empty;
+        [Required(ErrorMessage = "Username is Required")]
+        public string UserName { get; set; }
+        [Required(ErrorMessage = "Username is Required")]
+        public string Email { get; set; }
+        [Required(ErrorMessage = "Email is Required")]
+        public string Password { get; set; }
+        [Required(ErrorMessage = "Password is Required")]
+        public string ConfirmPassword { get; set; }       
         public IFormFile? ProfilePicture { get; set; }
+        [Required(ErrorMessage = "ProfilePicture is Required")]
     }
 }

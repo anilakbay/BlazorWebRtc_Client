@@ -1,6 +1,7 @@
 using BlazorWebRtc_Application.Features.Commands.Account.Login;
 using BlazorWebRtc_Application.Features.Commands.MessageCommand.SendMessage;
 using BlazorWebRtc_Application.Features.Commands.RequestFeature;
+using BlazorWebRtc_Application.Features.Commands.Upload;
 using BlazorWebRtc_Application.Features.Commands.UserFriend;
 using BlazorWebRtc_Application.Features.Queries.RequestFeature;
 using BlazorWebRtc_Application.Features.Queries.UserFriend;
@@ -30,6 +31,7 @@ internal class Program
         builder.Services.AddScoped<IRequestService, RequestService>();
         builder.Services.AddScoped<IUserFriendService, UserFriendService>();
         builder.Services.AddScoped<IMessageService, MessageService>();
+        builder.Services.AddScoped<IUploadService, UploadService >();
         builder.Services.AddMediatR(cfg =>
         {
             cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
@@ -41,6 +43,7 @@ internal class Program
             cfg.RegisterServicesFromAssembly(typeof(UserFriendHandler).Assembly);
             cfg.RegisterServicesFromAssembly(typeof(UserFriendListQuery).Assembly);
             cfg.RegisterServicesFromAssembly(typeof(SendMessageHandler).Assembly);
+            cfg.RegisterServicesFromAssembly(typeof(UploadHandle).Assembly);
         }
 
         );

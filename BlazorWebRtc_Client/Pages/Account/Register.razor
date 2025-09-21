@@ -1,4 +1,10 @@
 ﻿@page "/register"
+@using BlazorWebRtc_Client.Models.Request
+@using BlazorWebRtc_Client.Services.Abstract
+@using Microsoft.AspNetCore.Http
+@using static System.Runtime.InteropServices.JavaScript.JSType
+@inject IAccountService accountService
+@inject NavigationManager navigationManager
 
 <!DOCTYPE html>
 <html lang="en">
@@ -66,19 +72,63 @@
                 }
     </style>
 </head>
+@* <input type="text" placeholder="Username" />
+<input type="email" placeholder="Email" />
+<input type="password" placeholder="Password" />
+<input type="password" placeholder="Confirm Password" />
+<button>Register</button> *@
+
+
 <body>
     <div class="register-container">
         <h2>Create an Account</h2>
-        <input type="text" placeholder="Username" />
-        <input type="email" placeholder="Email" />
-        <input type="password" placeholder="Password" />
-        <input type="password" placeholder="Confirm Password" />
-        <button>Register</button>
+        <EditForm Model="@registerCommand" OnValidSubmit="HandleRegister">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <InputText @bind-Value="@registerCommand.UserName" placeholder="UserName" class="form-control"></InputText>
+            <ValidationMessage For="@(() => registerCommand.UserName)"></ValidationMessage>
+
+            <InputText @bind-Value="@registerCommand.Email" placeholder="Email" class="form-control"></InputText>
+            <ValidationMessage For="@(() => registerCommand.Email)"></ValidationMessage>
+
+            <InputText @bind-Value="@registerCommand.Password" placeholder="Password" type="password" class="form-control"></InputText>
+            <ValidationMessage For="@(() => registerCommand.Password)"></ValidationMessage>
+
+            <InputText @bind-Value="@registerCommand.ConfirmPassword" placeholder="ConfirmPassword" type="confirmpassword" class="form-control"></InputText>
+            <ValidationMessage For="@(() => registerCommand.ConfirmPassword)"></ValidationMessage>
+
+            <InputFile OnChange="HandleProfilePictureChange">
+           </InputFile>
+               <button type="submit">Register</button>
+
+        </EditForm>
+
         <p>Already have an account? <a href="/login">Login here</a></p>
     </div>
 </body>
 </html>
 
 @code {
-    // Register işlemiyle ilgili kodlar buraya eklenebilir
+
+    RegisterCommand registerCommand = new RegisterCommand();
+    private IBrowserFile selectedFile;
+
+    public async Task HandleRegister()
+    {
+        var response = await accountService.SignUp(registerCommand);
+        if (response != null && response.IsSuccess)
+        {
+            navigationManager.NavigateTo("login");
+        }
+        else
+        {
+            Console.WriteLine(error);
+        }
+    }
+ 
+    private void HandleProfilePictureChange(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
+    })
+
 }
