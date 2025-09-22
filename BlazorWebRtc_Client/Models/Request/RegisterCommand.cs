@@ -6,14 +6,17 @@ namespace BlazorWebRtc_Client.Models.Request
     public class RegisterCommand
     {
         [Required(ErrorMessage = "Username is Required")]
-        public string UserName { get; set; }
-        [Required(ErrorMessage = "Username is Required")]
-        public string Email { get; set; }
+        public string UserName { get; set; } = string.Empty;
+        
         [Required(ErrorMessage = "Email is Required")]
-        public string Password { get; set; }
+        public string Email { get; set; } = string.Empty;
+        
         [Required(ErrorMessage = "Password is Required")]
-        public string ConfirmPassword { get; set; }       
-        public IFormFile? ProfilePicture { get; set; }
+        public string Password { get; set; } = string.Empty;
+        
+        [Required(ErrorMessage = "ConfirmPassword is Required")]
+        public string ConfirmPassword { get; set; } = string.Empty;       
         [Required(ErrorMessage = "ProfilePicture is Required")]
+        public IFormFile? ProfilePicture { get; set; }
     }
 }

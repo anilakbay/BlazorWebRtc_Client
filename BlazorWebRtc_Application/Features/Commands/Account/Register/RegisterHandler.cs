@@ -10,7 +10,7 @@ using System.Security.Cryptography;
 namespace BlazorWebRtc_Application.Features.Commands.Account.Register
 {
     // Kullanıcı kayıt işlemlerini yöneten MediatR handler
-    public class RegisterHandler : IRequestHandler<RegisterCommand, Guid>
+    public class RegisterHandler : IRequestHandler<RegisterCommand, User>
     {
         private readonly AppDbContext _context;
 
@@ -20,7 +20,7 @@ namespace BlazorWebRtc_Application.Features.Commands.Account.Register
         }
 
         // Register isteğini işleyen metod
-        public async Task<Guid> Handle(RegisterCommand request, CancellationToken cancellationToken)
+        public async Task<User> Handle(RegisterCommand request, CancellationToken cancellationToken)
         {
             // Kullanıcı adı daha önce varsa hata fırlat
             if (await _context.Users.AnyAsync(u => u.UserName == request.UserName, cancellationToken))
@@ -39,7 +39,7 @@ namespace BlazorWebRtc_Application.Features.Commands.Account.Register
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync(cancellationToken);
-            return user.Id;
+            return user;
 
             //// Profil resmi varsa kaydet
             //if (request.ProfilePicture is not null && request.ProfilePicture.Length > 0)

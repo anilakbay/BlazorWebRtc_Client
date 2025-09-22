@@ -15,7 +15,7 @@ namespace BlazorWebRtc_Application.Features.Commands.Upload
         public async Task<bool> Handle(UploadCommand request, CancellationToken cancellationToken)
         {
             var result = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId);
-            result.ProfilePicture = request.file;
+            result.ProfilePicture = request.FileUrl;
 
             if (await _context.SaveChangesAsync() > 0)
             {              

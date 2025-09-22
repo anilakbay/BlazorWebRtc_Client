@@ -1,4 +1,5 @@
-﻿using BlazorWebRtc_Application.Interface.Services;
+﻿using BlazorWebRtc_Application.Features.Commands.Upload;
+using BlazorWebRtc_Application.Interface.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,7 +25,7 @@ namespace BlazorWebRtc_Api.Controllers
                 return BadRequest("No file uploaded.");
 
             // Dosyanın wwwroot altında saklanacağı dizin
-            var uploadPath = Path.Combine(_webHostEnvironment.WebRootPath, "images");
+            var uploadPath = Path.Combine(_webHostEnvironment.WebRootPath, "images", "avatars");
 
             // Eğer dizin yoksa oluşturulur
             if (!Directory.Exists(uploadPath))
@@ -42,9 +43,18 @@ namespace BlazorWebRtc_Api.Controllers
             }
 
             // Dosyanın tarayıcıda erişilebilir yolu
-            var imageUrl = $"/images/{fileName}";
+            var imageUrl = $"/images/avatars/{fileName}";
 
-            return Ok(imageUrl);  // Bu URL frontend'e dönecek
+            UploadCommand command = new UploadCommand();
+            command.FileUrl = imageUrl;
+            command.UserId = Guid.Parse(userId);
+
+            var result = await _uploadService.UploadFile(command);
+            if (result.IsSuccess)
+            {
+                return Ok(imageUrl);  // Bu URL frontend'e dönecek
+            }
+            return BadRequest(result.Message);
         }
     }
 }

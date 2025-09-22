@@ -5,7 +5,7 @@ namespace BlazorWebRtc_Application.Features.Commands.Upload
 {
     public class UploadCommand: IRequest<bool>
     {
-        public IFormFile file { get; set; }
+        public string FileUrl { get; set; } = string.Empty;
         public Guid UserId { get; set; } 
     }
 }

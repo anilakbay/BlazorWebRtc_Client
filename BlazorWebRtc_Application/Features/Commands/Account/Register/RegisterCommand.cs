@@ -1,9 +1,9 @@
-﻿using MediatR;
-using Microsoft.AspNetCore.Http;
+﻿using BlazorWebRtc_Domain;
+using MediatR;
 
 namespace BlazorWebRtc_Application.Features.Commands.Account.Register
 {
-    public class RegisterCommand:IRequest<Guid>
+    public class RegisterCommand:IRequest<User>
     {
         public string UserName { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
