@@ -16,7 +16,7 @@ namespace BlazorWebRtc_Client.Models.Request
         
         [Required(ErrorMessage = "ConfirmPassword is Required")]
         public string ConfirmPassword { get; set; } = string.Empty;       
-        [Required(ErrorMessage = "ProfilePicture is Required")]
+        
         public IFormFile? ProfilePicture { get; set; }
     }
 }

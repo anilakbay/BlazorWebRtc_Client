@@ -1,32 +1,230 @@
 ﻿@inherits LayoutComponentBase
+@inject NavigationManager Navigation
 
-<div class="page">
-    <header class="top-navbar">
-        <div class="navbar-brand">
-            <a href="">Friendship App</a>
+<div class="app-layout">
+    <header class="app-header">
+        <div class="header-content">
+            <div class="logo">
+                <a href="/" class="logo-link">
+                    <span class="logo-icon">📹</span>
+                    <span class="logo-text">BlazorWebRTC</span>
+                </a>
+            </div>
+            
+            <nav class="main-nav">
+                <NavLink href="/" class="@GetNavLinkClass("/")" Match="NavLinkMatch.All">
+                    Home
+                </NavLink>
+                <NavLink href="/users" class="@GetNavLinkClass("/users")">
+                    Users
+                </NavLink>
+                <NavLink href="/login" class="@GetNavLinkClass("/login")">
+                    Login
+                </NavLink>
+                <NavLink href="/register" class="@GetNavLinkClass("/register")">
+                    Register
+                </NavLink>
+            </nav>
+
+            <div class="header-actions">
+                <button class="btn btn-outline" @onclick="ToggleTheme">
+                    <span class="theme-icon">🌙</span>
+                </button>
+            </div>
         </div>
-        <nav class="navbar-nav">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                🏠 Home
-            </NavLink>
-            <NavLink class="nav-link" href="home">
-                🔍 Discover
-            </NavLink>
-            <NavLink class="nav-link" href="#">
-                💬 Messages
-            </NavLink>
-            <NavLink class="nav-link" href="#">
-                🔔 Notifications
-            </NavLink>
-            <NavLink class="nav-link" href="#">
-                👤 Profile
-            </NavLink>
-        </nav>
     </header>
 
-    <main>
-        <article class="content px-4">
-            @Body
-        </article>
+    <main class="app-main">
+        @Body
     </main>
+
+    <footer class="app-footer">
+        <div class="footer-content">
+            <p>&copy; 2024 BlazorWebRTC. Built with ❤️ using Blazor WebAssembly.</p>
+        </div>
+    </footer>
 </div>
+
+<style>
+    .app-layout {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        background: #f8fafc;
+    }
+
+    .app-header {
+        background: white;
+        border-bottom: 1px solid #e2e8f0;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    }
+
+    .header-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 70px;
+    }
+
+    .logo {
+        display: flex;
+        align-items: center;
+    }
+
+    .logo-link {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        color: #2d3748;
+        font-weight: 700;
+        font-size: 1.25rem;
+    }
+
+    .logo-icon {
+        font-size: 1.5rem;
+        margin-right: 0.5rem;
+    }
+
+    .logo-text {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .main-nav {
+        display: flex;
+        gap: 2rem;
+    }
+
+    .nav-link {
+        text-decoration: none;
+        color: #4a5568;
+        font-weight: 500;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+        position: relative;
+    }
+
+    .nav-link:hover {
+        color: #667eea;
+        background: #f7fafc;
+    }
+
+    .nav-link.active {
+        color: #667eea;
+        background: #edf2f7;
+    }
+
+    .nav-link.active::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 20px;
+        height: 2px;
+        background: #667eea;
+        border-radius: 1px;
+    }
+
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .btn {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 8px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-outline {
+        background: transparent;
+        border: 1px solid #e2e8f0;
+        color: #4a5568;
+    }
+
+    .btn-outline:hover {
+        background: #f7fafc;
+        border-color: #cbd5e0;
+    }
+
+    .theme-icon {
+        font-size: 1.125rem;
+    }
+
+    .app-main {
+        flex: 1;
+        min-height: calc(100vh - 140px);
+    }
+
+    .app-footer {
+        background: #2d3748;
+        color: white;
+        padding: 2rem;
+        text-align: center;
+        margin-top: auto;
+    }
+
+    .footer-content {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .footer-content p {
+        margin: 0;
+        opacity: 0.8;
+    }
+
+    @@media (max-width: 768px) {
+        .header-content {
+            padding: 0 1rem;
+            flex-wrap: wrap;
+            height: auto;
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+
+        .main-nav {
+            order: 3;
+            width: 100%;
+            justify-content: center;
+            margin-top: 1rem;
+            gap: 1rem;
+        }
+
+        .header-actions {
+            order: 2;
+        }
+    }
+</style>
+
+@code {
+    private string GetNavLinkClass(string path)
+    {
+        var currentPath = Navigation.ToBaseRelativePath(Navigation.Uri);
+        var isActive = currentPath == path.TrimStart('/');
+        return isActive ? "nav-link active" : "nav-link";
+    }
+
+    private void ToggleTheme()
+    {
+        // Theme toggle functionality can be implemented here
+        Console.WriteLine("Theme toggle clicked");
+    }
+}

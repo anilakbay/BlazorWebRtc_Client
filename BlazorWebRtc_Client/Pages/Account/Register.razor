@@ -1,134 +1,377 @@
 ﻿@page "/register"
 @using BlazorWebRtc_Client.Models.Request
 @using BlazorWebRtc_Client.Services.Abstract
-@using Microsoft.AspNetCore.Http
-@using static System.Runtime.InteropServices.JavaScript.JSType
-@inject IAccountService accountService
-@inject NavigationManager navigationManager
+@using Microsoft.AspNetCore.Components.Forms
+@inject IAccountService _accountService
+@inject NavigationManager _navigationManager
+@inject IJSRuntime _jsRuntime
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register</title>
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f0f8ff;
-            font-family: Arial, sans-serif;
-        }
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1 class="auth-title">Create Account</h1>
+            <p class="auth-subtitle">Join us and start your journey</p>
+        </div>
 
-        .register-container {
-            background-color: white;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-            max-width: 400px;
-            width: 100%;
-        }
-
-            .register-container h2 {
-                text-align: center;
-                margin-bottom: 1.5rem;
-                color: #007bff;
-            }
-
-            .register-container input {
-                width: 100%;
-                padding: 0.75rem;
-                margin-bottom: 1rem;
-                border-radius: 5px;
-                border: 1px solid #ddd;
-                font-size: 1rem;
-            }
-
-            .register-container button {
-                width: 100%;
-                padding: 0.75rem;
-                background-color: #007bff;
-                color: white;
-                border: none;
-                border-radius: 5px;
-                font-size: 1rem;
-                cursor: pointer;
-            }
-
-                .register-container button:hover {
-                    background-color: #0056b3;
-                }
-
-            .register-container p {
-                text-align: center;
-                margin-top: 1rem;
-            }
-
-                .register-container p a {
-                    color: #007bff;
-                    text-decoration: none;
-                }
-    </style>
-</head>
-@* <input type="text" placeholder="Username" />
-<input type="email" placeholder="Email" />
-<input type="password" placeholder="Password" />
-<input type="password" placeholder="Confirm Password" />
-<button>Register</button> *@
-
-
-<body>
-    <div class="register-container">
-        <h2>Create an Account</h2>
-        <EditForm Model="@registerCommand" OnValidSubmit="HandleRegister">
+        <EditForm Model="@_registerModel" OnValidSubmit="OnRegisterSubmit" class="auth-form">
             <DataAnnotationsValidator />
-            <ValidationSummary />
-            <InputText @bind-Value="@registerCommand.UserName" placeholder="UserName" class="form-control"></InputText>
-            <ValidationMessage For="@(() => registerCommand.UserName)"></ValidationMessage>
+            
+            <div class="form-group">
+                <label class="form-label">Username</label>
+                <InputText @bind-Value="@_registerModel.UserName" 
+                          class="@GetInputClass(_isUsernameValid)"
+                          placeholder="Choose a username" />
+                <ValidationMessage For="@(() => _registerModel.UserName)" class="validation-error" />
+            </div>
 
-            <InputText @bind-Value="@registerCommand.Email" placeholder="Email" class="form-control"></InputText>
-            <ValidationMessage For="@(() => registerCommand.Email)"></ValidationMessage>
+            <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <InputText @bind-Value="@_registerModel.Email" 
+                          class="@GetInputClass(_isEmailValid)"
+                          placeholder="Enter your email" />
+                <ValidationMessage For="@(() => _registerModel.Email)" class="validation-error" />
+            </div>
 
-            <InputText @bind-Value="@registerCommand.Password" placeholder="Password" type="password" class="form-control"></InputText>
-            <ValidationMessage For="@(() => registerCommand.Password)"></ValidationMessage>
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <InputText @bind-Value="@_registerModel.Password" 
+                          type="password"
+                          class="@GetInputClass(_isPasswordValid)"
+                          placeholder="Create a strong password" />
+                <ValidationMessage For="@(() => _registerModel.Password)" class="validation-error" />
+            </div>
 
-            <InputText @bind-Value="@registerCommand.ConfirmPassword" placeholder="ConfirmPassword" type="confirmpassword" class="form-control"></InputText>
-            <ValidationMessage For="@(() => registerCommand.ConfirmPassword)"></ValidationMessage>
+            <div class="form-group">
+                <label class="form-label">Confirm Password</label>
+                <InputText @bind-Value="@_registerModel.ConfirmPassword" 
+                          type="password"
+                          class="@GetInputClass(_isConfirmPasswordValid)"
+                          placeholder="Confirm your password" />
+                <ValidationMessage For="@(() => _registerModel.ConfirmPassword)" class="validation-error" />
+            </div>
 
-            <InputFile OnChange="HandleProfilePictureChange">
-           </InputFile>
-               <button type="submit">Register</button>
+            <div class="form-group">
+                <label class="form-label">Profile Picture</label>
+                <div class="file-upload-container">
+                    <InputFile OnChange="OnProfilePictureChange" 
+                              class="file-input"
+                              accept="image/*" />
+                    <div class="file-upload-display">
+                        @if (_selectedFile != null)
+                        {
+                            <span class="file-name">@_selectedFile.Name</span>
+                        }
+                        else
+                        {
+                            <span class="file-placeholder">Choose a profile picture</span>
+                        }
+                    </div>
+                </div>
+            </div>
 
+            <div class="form-actions">
+                <button type="submit" 
+                        class="btn btn-primary @(_isLoading ? "loading" : "")"
+                        disabled="@_isLoading">
+                    @if (_isLoading)
+                    {
+                        <span class="spinner"></span>
+                        <span>Creating account...</span>
+                    }
+                    else
+                    {
+                        <span>Create Account</span>
+                    }
+                </button>
+            </div>
         </EditForm>
 
-        <p>Already have an account? <a href="/login">Login here</a></p>
+        <div class="auth-footer">
+            <p class="auth-link-text">
+                Already have an account? 
+                <a href="/login" class="auth-link">Sign in here</a>
+            </p>
+        </div>
     </div>
-</body>
-</html>
+</div>
+
+<style>
+    .auth-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 1rem;
+    }
+
+    .auth-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        padding: 2.5rem;
+        width: 100%;
+        max-width: 480px;
+        backdrop-filter: blur(10px);
+    }
+
+    .auth-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .auth-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1a202c;
+        margin: 0 0 0.5rem 0;
+    }
+
+    .auth-subtitle {
+        color: #718096;
+        font-size: 1rem;
+        margin: 0;
+    }
+
+    .auth-form {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.2s ease;
+        background: #f7fafc;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: #667eea;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-input.invalid {
+        border-color: #e53e3e;
+        background: #fed7d7;
+    }
+
+    .validation-error {
+        color: #e53e3e;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+        display: block;
+    }
+
+    .file-upload-container {
+        position: relative;
+    }
+
+    .file-input {
+        position: absolute;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+    }
+
+    .file-upload-display {
+        padding: 0.875rem 1rem;
+        border: 2px dashed #e2e8f0;
+        border-radius: 8px;
+        background: #f7fafc;
+        text-align: center;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+
+    .file-upload-display:hover {
+        border-color: #667eea;
+        background: #edf2f7;
+    }
+
+    .file-name {
+        color: #2d3748;
+        font-weight: 500;
+    }
+
+    .file-placeholder {
+        color: #718096;
+    }
+
+    .form-actions {
+        margin-top: 2rem;
+    }
+
+    .btn {
+        width: 100%;
+        padding: 0.875rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-primary:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+
+    .btn.loading {
+        pointer-events: none;
+    }
+
+    .spinner {
+        width: 16px;
+        height: 16px;
+        border: 2px solid transparent;
+        border-top: 2px solid currentColor;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @@keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .auth-footer {
+        text-align: center;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .auth-link-text {
+        color: #718096;
+        font-size: 0.875rem;
+        margin: 0;
+    }
+
+    .auth-link {
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.2s ease;
+    }
+
+    .auth-link:hover {
+        color: #5a67d8;
+        text-decoration: underline;
+    }
+</style>
 
 @code {
+    private RegisterCommand _registerModel = new();
+    private IBrowserFile? _selectedFile;
+    private bool _isLoading = false;
+    private bool _isUsernameValid = true;
+    private bool _isEmailValid = true;
+    private bool _isPasswordValid = true;
+    private bool _isConfirmPasswordValid = true;
 
-    RegisterCommand registerCommand = new RegisterCommand();
-    private IBrowserFile selectedFile;
-
-    public async Task HandleRegister()
+    protected override void OnInitialized()
     {
-        var response = await accountService.SignUp(registerCommand);
-        if (response != null && response.IsSuccess)
-        {
-            navigationManager.NavigateTo("login");
-        }
-        else
-        {
-            Console.WriteLine("Registration failed");
-        }
-    }
- 
-    private void HandleProfilePictureChange(InputFileChangeEventArgs e)
-    {
-        selectedFile = e.File;
+        _registerModel = new RegisterCommand();
     }
 
+    private async Task OnRegisterSubmit()
+    {
+        if (_isLoading) return;
+
+        // Password confirmation validation
+        if (_registerModel.Password != _registerModel.ConfirmPassword)
+        {
+            _isConfirmPasswordValid = false;
+            await ShowErrorMessage("Passwords do not match.");
+            return;
+        }
+
+        _isLoading = true;
+        _isUsernameValid = true;
+        _isEmailValid = true;
+        _isPasswordValid = true;
+        _isConfirmPasswordValid = true;
+
+        try
+        {
+            // File upload işlemi
+            if (_selectedFile != null)
+            {
+                _registerModel.ProfilePicture = _selectedFile;
+            }
+
+            var response = await _accountService.SignUp(_registerModel);
+            
+            if (response?.IsSuccess == true)
+            {
+                await ShowSuccessMessage("Account created successfully! Please sign in.");
+                _navigationManager.NavigateTo("/login", forceLoad: true);
+            }
+            else
+            {
+                await ShowErrorMessage("Registration failed. Please try again.");
+            }
+        }
+        catch (Exception ex)
+        {
+            await ShowErrorMessage("An error occurred during registration. Please try again.");
+            Console.WriteLine($"Registration error: {ex.Message}");
+        }
+        finally
+        {
+            _isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private void OnProfilePictureChange(InputFileChangeEventArgs e)
+    {
+        _selectedFile = e.File;
+        StateHasChanged();
+    }
+
+    private async Task ShowErrorMessage(string message)
+    {
+        await _jsRuntime.InvokeVoidAsync("alert", message);
+    }
+
+    private async Task ShowSuccessMessage(string message)
+    {
+        await _jsRuntime.InvokeVoidAsync("alert", message);
+    }
+
+    private string GetInputClass(bool isValid)
+    {
+        return isValid ? "form-input" : "form-input invalid";
+    }
 }

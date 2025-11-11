@@ -1,82 +1,281 @@
 ﻿@page "/login"
+@using BlazorWebRtc_Client.Models.Request
+@using BlazorWebRtc_Client.Services.Abstract
+@using Microsoft.AspNetCore.Components.Forms
+@inject IAccountService _accountService
+@inject NavigationManager _navigationManager
+@inject IJSRuntime _jsRuntime
+@inject AuthenticationService _authService
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f0f8ff;
-            font-family: Arial, sans-serif;
-        }
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1 class="auth-title">Welcome Back</h1>
+            <p class="auth-subtitle">Sign in to your account</p>
+        </div>
 
-        .login-container {
-            background-color: white;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-            max-width: 400px;
-            width: 100%;
-        }
+        <EditForm Model="@_loginModel" OnValidSubmit="OnLoginSubmit" class="auth-form">
+            <DataAnnotationsValidator />
+            
+            <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <InputText @bind-Value="@_loginModel.Email" 
+                          class="@GetInputClass(_isEmailValid)"
+                          placeholder="Enter your email" />
+                <ValidationMessage For="@(() => _loginModel.Email)" class="validation-error" />
+            </div>
 
-            .login-container h2 {
-                text-align: center;
-                margin-bottom: 1.5rem;
-                color: #007bff;
-            }
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <InputText @bind-Value="@_loginModel.Password" 
+                          type="password"
+                          class="@GetInputClass(_isPasswordValid)"
+                          placeholder="Enter your password" />
+                <ValidationMessage For="@(() => _loginModel.Password)" class="validation-error" />
+            </div>
 
-            .login-container input {
-                width: 100%;
-                padding: 0.75rem;
-                margin-bottom: 1rem;
-                border-radius: 5px;
-                border: 1px solid #ddd;
-                font-size: 1rem;
-            }
+            <div class="form-actions">
+                <button type="submit" 
+                        class="btn btn-primary @(_isLoading ? "loading" : "")"
+                        disabled="@_isLoading">
+                    @if (_isLoading)
+                    {
+                        <span class="spinner"></span>
+                        <span>Signing in...</span>
+                    }
+                    else
+                    {
+                        <span>Sign In</span>
+                    }
+                </button>
+            </div>
+        </EditForm>
 
-            .login-container button {
-                width: 100%;
-                padding: 0.75rem;
-                background-color: #007bff;
-                color: white;
-                border: none;
-                border-radius: 5px;
-                font-size: 1rem;
-                cursor: pointer;
-            }
-
-                .login-container button:hover {
-                    background-color: #0056b3;
-                }
-
-            .login-container p {
-                text-align: center;
-                margin-top: 1rem;
-            }
-
-                .login-container p a {
-                    color: #007bff;
-                    text-decoration: none;
-                }
-    </style>
-</head>
-<body>
-    <div class="login-container">
-        <h2>Login</h2>
-        <input type="email" placeholder="Email" />
-        <input type="password" placeholder="Password" />
-        <button>Login</button>
-        <p>Don't have an account? <a href="/register">Register here</a></p>
+        <div class="auth-footer">
+            <p class="auth-link-text">
+                Don't have an account? 
+                <a href="/register" class="auth-link">Create one here</a>
+            </p>
+        </div>
     </div>
-</body>
-</html>
+</div>
+
+<style>
+    .auth-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 1rem;
+    }
+
+    .auth-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        padding: 2.5rem;
+        width: 100%;
+        max-width: 420px;
+        backdrop-filter: blur(10px);
+    }
+
+    .auth-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .auth-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1a202c;
+        margin: 0 0 0.5rem 0;
+    }
+
+    .auth-subtitle {
+        color: #718096;
+        font-size: 1rem;
+        margin: 0;
+    }
+
+    .auth-form {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.2s ease;
+        background: #f7fafc;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: #667eea;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-input.invalid {
+        border-color: #e53e3e;
+        background: #fed7d7;
+    }
+
+    .validation-error {
+        color: #e53e3e;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+        display: block;
+    }
+
+    .form-actions {
+        margin-top: 2rem;
+    }
+
+    .btn {
+        width: 100%;
+        padding: 0.875rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-primary:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+
+    .btn.loading {
+        pointer-events: none;
+    }
+
+    .spinner {
+        width: 16px;
+        height: 16px;
+        border: 2px solid transparent;
+        border-top: 2px solid currentColor;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @@keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .auth-footer {
+        text-align: center;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .auth-link-text {
+        color: #718096;
+        font-size: 0.875rem;
+        margin: 0;
+    }
+
+    .auth-link {
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.2s ease;
+    }
+
+    .auth-link:hover {
+        color: #5a67d8;
+        text-decoration: underline;
+    }
+</style>
 
 @code {
-    // Login işlemiyle ilgili kodlar buraya eklenebilir
+    private LoginCommand _loginModel = new();
+    private bool _isLoading = false;
+    private bool _isEmailValid = true;
+    private bool _isPasswordValid = true;
+
+    protected override void OnInitialized()
+    {
+        _loginModel = new LoginCommand();
+    }
+
+    private async Task OnLoginSubmit()
+    {
+        if (_isLoading) return;
+
+        _isLoading = true;
+        _isEmailValid = true;
+        _isPasswordValid = true;
+
+        try
+        {
+            var response = await _accountService.SignIn(_loginModel);
+            
+            if (await _authService.LoginAsync(response))
+            {
+                await ShowSuccessMessage("Login successful! Welcome back.");
+                _navigationManager.NavigateTo("/", forceLoad: true);
+            }
+            else
+            {
+                await ShowErrorMessage("Invalid email or password. Please try again.");
+            }
+        }
+        catch (Exception ex)
+        {
+            await ShowErrorMessage("An error occurred during login. Please try again.");
+            Console.WriteLine($"Login error: {ex.Message}");
+        }
+        finally
+        {
+            _isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task ShowErrorMessage(string message)
+    {
+        await _jsRuntime.InvokeVoidAsync("alert", message);
+    }
+
+    private async Task ShowSuccessMessage(string message)
+    {
+        await _jsRuntime.InvokeVoidAsync("alert", message);
+    }
+
+    private string GetInputClass(bool isValid)
+    {
+        return isValid ? "form-input" : "form-input invalid";
+    }
 }

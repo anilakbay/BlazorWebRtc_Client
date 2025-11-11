@@ -50,11 +50,7 @@ namespace BlazorWebRtc_Api.Controllers
             command.UserId = Guid.Parse(userId);
 
             var result = await _uploadService.UploadFile(command);
-            if (result.IsSuccess)
-            {
-                return Ok(imageUrl);  // Bu URL frontend'e dönecek
-            }
-            return BadRequest(result.Message);
+            return Ok(result);
         }
     }
 }

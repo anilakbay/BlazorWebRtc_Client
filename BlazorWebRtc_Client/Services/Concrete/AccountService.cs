@@ -32,6 +32,22 @@ namespace BlazorWebRtc_Client.Services.Concrete
             }
         }
 
-      
+        public async Task<ResponseModel> SignIn(LoginCommand command)
+        {
+            var content = JsonConvert.SerializeObject(command);
+            var bodyContent = new StringContent(content, Encoding.UTF8, "application/json");
+            var response = await _httpClient.PostAsync("api/User/login", bodyContent);
+            var contentTemp = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<ResponseModel>(contentTemp);
+
+            if (response.IsSuccessStatusCode)
+            {               
+                return result;
+            }
+            else
+            {
+                return null;
+            }
+        }
     }
 }

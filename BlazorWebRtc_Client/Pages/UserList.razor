@@ -1,0 +1,486 @@
+@page "/users"
+@using BlazorWebRtc_Client.Services
+@using Microsoft.AspNetCore.Components.Authorization
+@inject UserService _userService
+@inject AuthenticationService _authService
+@inject AuthenticationStateProvider _authStateProvider
+@inject NavigationManager _navigationManager
+@inject IJSRuntime _jsRuntime
+@attribute [Authorize]
+
+<div class="user-list-container">
+    <div class="user-list-header">
+        <h1 class="page-title">Users</h1>
+        <div class="header-actions">
+            <button class="btn btn-outline" @onclick="RefreshUsers">
+                <span class="btn-icon">🔄</span>
+                Refresh
+            </button>
+            <button class="btn btn-danger" @onclick="Logout">
+                <span class="btn-icon">🚪</span>
+                Logout
+            </button>
+        </div>
+    </div>
+
+    @if (_isLoading)
+    {
+        <div class="loading-container">
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+                <div class="loading-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+            <p class="loading-text">Loading users...</p>
+        </div>
+    }
+    else if (_users.Any())
+    {
+        <div class="users-grid">
+            @foreach (var user in _users)
+            {
+                <div class="user-card">
+                    <div class="user-avatar">
+                        @if (!string.IsNullOrEmpty(user.ProfilePicture))
+                        {
+                            <img src="@GetProfileImageUrl(user.ProfilePicture)" 
+                                 alt="@user.UserName" 
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                            <div class="default-avatar" style="display: none;">
+                                <span>@user.UserName.Substring(0, 1).ToUpper()</span>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="default-avatar">
+                                <span>@user.UserName.Substring(0, 1).ToUpper()</span>
+                            </div>
+                        }
+                        <div class="online-status @(user.IsOnline ? "online" : "offline")"></div>
+                    </div>
+                    
+                    <div class="user-info">
+                        <h3 class="user-name">@user.UserName</h3>
+                        <p class="user-email">@user.Email</p>
+                        <p class="user-joined">Joined: @user.CreatedDate.ToString("MMM dd, yyyy")</p>
+                    </div>
+                    
+                    <div class="user-actions">
+                        @if (user.IsFriend)
+                        {
+                            <button class="btn btn-danger btn-sm" @onclick="() => RemoveFriend(user.Id)">
+                                Remove Friend
+                            </button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-primary btn-sm" @onclick="() => AddFriend(user.Id)">
+                                Add Friend
+                            </button>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">
+            <div class="empty-icon">👥</div>
+            <h3>No users found</h3>
+            <p>There are no users to display at the moment.</p>
+        </div>
+    }
+</div>
+
+<style>
+    .user-list-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .user-list-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .page-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #2d3748;
+        margin: 0;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .btn {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 8px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+    }
+
+    .btn-outline {
+        background: transparent;
+        border: 1px solid #e2e8f0;
+        color: #4a5568;
+    }
+
+    .btn-outline:hover {
+        background: #f7fafc;
+        border-color: #cbd5e0;
+    }
+
+    .btn-primary {
+        background: #667eea;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #5a67d8;
+    }
+
+    .btn-danger {
+        background: #e53e3e;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background: #c53030;
+    }
+
+    .btn-sm {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.875rem;
+    }
+
+    .btn-icon {
+        font-size: 1rem;
+    }
+
+    .loading-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 4rem 2rem;
+    }
+
+    .loading-spinner {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #e2e8f0;
+        border-top: 4px solid #667eea;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    .loading-dots {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .loading-dots span {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #667eea;
+        animation: bounce 1.4s ease-in-out infinite both;
+    }
+
+    .loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+    .loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+    .loading-text {
+        color: #718096;
+        font-size: 1rem;
+        margin: 0;
+    }
+
+    @@keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    @@keyframes bounce {
+        0%, 80%, 100% {
+            transform: scale(0);
+        }
+        40% {
+            transform: scale(1);
+        }
+    }
+
+    .users-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .user-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s ease;
+        border: 1px solid #e2e8f0;
+    }
+
+    .user-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .user-avatar {
+        position: relative;
+        width: 60px;
+        height: 60px;
+        margin: 0 auto 1rem;
+    }
+
+    .user-avatar img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #e2e8f0;
+        transition: all 0.3s ease;
+    }
+
+    .user-avatar img:hover {
+        border-color: #667eea;
+        transform: scale(1.05);
+    }
+
+    .default-avatar {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+
+    .online-status {
+        position: absolute;
+        bottom: 2px;
+        right: 2px;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        border: 2px solid white;
+    }
+
+    .online-status.online {
+        background: #48bb78;
+    }
+
+    .online-status.offline {
+        background: #a0aec0;
+    }
+
+    .user-info {
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+
+    .user-name {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #2d3748;
+        margin: 0 0 0.5rem 0;
+    }
+
+    .user-email {
+        color: #718096;
+        font-size: 0.875rem;
+        margin: 0 0 0.5rem 0;
+    }
+
+    .user-joined {
+        color: #a0aec0;
+        font-size: 0.75rem;
+        margin: 0;
+    }
+
+    .user-actions {
+        text-align: center;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+
+    .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state h3 {
+        font-size: 1.5rem;
+        color: #2d3748;
+        margin: 0 0 0.5rem 0;
+    }
+
+    .empty-state p {
+        color: #718096;
+        margin: 0;
+    }
+
+    @@media (max-width: 768px) {
+        .user-list-header {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: stretch;
+        }
+
+        .header-actions {
+            justify-content: center;
+        }
+
+        .users-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+@code {
+    private List<UserDto> _users = new();
+    private bool _isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadUsers();
+    }
+
+    private async Task LoadUsers()
+    {
+        _isLoading = true;
+        StateHasChanged();
+
+        try
+        {
+            _users = await _userService.GetUsersAsync();
+        }
+        catch (Exception ex)
+        {
+            await _jsRuntime.InvokeVoidAsync("alert", $"Error loading users: {ex.Message}");
+        }
+        finally
+        {
+            _isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task RefreshUsers()
+    {
+        await LoadUsers();
+    }
+
+    private async Task AddFriend(Guid userId)
+    {
+        try
+        {
+            var currentUser = await _authService.GetUserAsync<object>();
+            // Burada current user ID'sini almanız gerekiyor
+            // Şimdilik basit bir implementasyon
+            
+            var success = await _userService.AddFriendAsync(Guid.NewGuid(), userId);
+            if (success)
+            {
+                await _jsRuntime.InvokeVoidAsync("alert", "Friend added successfully!");
+                await LoadUsers();
+            }
+            else
+            {
+                await _jsRuntime.InvokeVoidAsync("alert", "Failed to add friend.");
+            }
+        }
+        catch (Exception ex)
+        {
+            await _jsRuntime.InvokeVoidAsync("alert", $"Error: {ex.Message}");
+        }
+    }
+
+    private async Task RemoveFriend(Guid userId)
+    {
+        try
+        {
+            var success = await _userService.RemoveFriendAsync(Guid.NewGuid(), userId);
+            if (success)
+            {
+                await _jsRuntime.InvokeVoidAsync("alert", "Friend removed successfully!");
+                await LoadUsers();
+            }
+            else
+            {
+                await _jsRuntime.InvokeVoidAsync("alert", "Failed to remove friend.");
+            }
+        }
+        catch (Exception ex)
+        {
+            await _jsRuntime.InvokeVoidAsync("alert", $"Error: {ex.Message}");
+        }
+    }
+
+    private async Task Logout()
+    {
+        try
+        {
+            await _authService.LogoutAsync();
+            if (_authStateProvider is CustomAuthStateProvider customProvider)
+            {
+                customProvider.NotifyUserLogout();
+            }
+            _navigationManager.NavigateTo("/login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            await _jsRuntime.InvokeVoidAsync("alert", $"Logout error: {ex.Message}");
+        }
+    }
+
+    private string GetProfileImageUrl(string? profilePicture)
+    {
+        if (string.IsNullOrEmpty(profilePicture))
+            return "/images/avatars/default-avatar.png";
+
+        // Eğer tam URL ise direkt döndür
+        if (profilePicture.StartsWith("http"))
+            return profilePicture;
+
+        // Eğer relative path ise API base URL ile birleştir
+        return $"https://localhost:7071{profilePicture}";
+    }
+}

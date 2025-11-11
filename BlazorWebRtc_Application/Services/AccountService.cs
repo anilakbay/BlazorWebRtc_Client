@@ -32,7 +32,7 @@ namespace BlazorWebRtc_Application.Services
         public async Task<BaseResponseModel> SignUp(RegisterCommand command)
         {
             var response = await mediator.Send(command);
-            if (response != Guid.Empty)
+            if (response != null)
             {
                 _responseModel.IsSuccess = true;
                 _responseModel.Data = response;
